@@ -127,3 +127,57 @@ function taller_delete_instance($id) {
 
     return true;
 }
+
+/**
+ * Serves the files from the workshop file areas
+ *
+ * Apart from module intro (handled by pluginfile.php automatically), workshop files may be
+ * media inserted into submission content (like images) and submission attachments. For these two,
+ * the fileareas submission_content and submission_attachment are used.
+ * Besides that, areas instructauthors, instructreviewers and conclusion contain the media
+ * embedded using the mod_form.php.
+ *
+ * @package  mod_workshop
+ * @category files
+ *
+ * @param stdClass $course the course object
+ * @param stdClass $cm the course module object
+ * @param stdClass $context the workshop's context
+ * @param string $filearea the name of the file area
+ * @param array $args extra arguments (itemid, path)
+ * @param bool $forcedownload whether or not force download
+ * @param array $options additional options affecting the file serving
+ * @return bool false if the file not found, just send the file otherwise and do not return anything
+ */
+function taller_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
+    global $DB, $CFG, $USER;
+
+    if ($context->contextlevel != CONTEXT_MODULE) {
+        return false;
+    }
+
+    require_login($course, true, $cm);
+
+    if ($filearea === 'submission_attachment') {
+        $itemid = (int)array_shift($args);
+        if (!$taller = $DB->get_record('taller', array('id' => $cm->instance))) {
+            return false;
+        }
+        if (!$submission = $DB->get_record('taller_entrega', array('id' => $itemid, 'taller_id' => $taller->id))) {
+            return false;
+        }
+
+        $fs = get_file_storage();
+        $relativepath = implode('/', $args);
+        $fullpath = "/$context->id/mod_taller/$filearea/$itemid/$relativepath";
+        if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
+            return false;
+        }
+        // finally send the file
+        // these files are uploaded by students - forcing download for security reasons
+        send_stored_file($file, 0, 0, true, $options);
+
+    }
+
+    return false;
+}

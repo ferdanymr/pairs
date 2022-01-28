@@ -123,15 +123,10 @@ if($envio->id && !$edit){
     
     $data = end($data);
     $archivoUrl = new moodle_url("/draftfile.php/$data->contextid/user/draft/$data->itemid/$data->filename");
-    $archivoUrl2 = new moodle_url("/pluginfile.php/$data->contextid/mod_taller/submission_attachment/$data->itemid/$data->filename");
 
     echo '<a class="btn btn-secondary" href="'. $archivoUrl.'">'.$data->filename.'</a>';
     echo '<br>';
     echo '<br>';
-    echo '<a class="btn btn-secondary" href="'. $archivoUrl2.'">'.$data->filename.'2</a>';
-    echo '<br>';
-    echo '<br>';
-    
     $url = new moodle_url('/mod/taller/envio.php', array('id' => $cm->id, 'env'=>$envio->id, 'edit'=>'1'));
     $urlDelete = new moodle_url('/mod/taller/envio.php', array('id' => $cm->id, 'delete' => $envio->id));
 

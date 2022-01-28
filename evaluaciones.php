@@ -66,9 +66,9 @@ if($idTrabajo){
         $evaluacion->is_evaluado        = '0';
         $evaluacion->status             = '1';
         $evaluacion->edit_user_id       = '0';
-        $evaluacion->entrega_id         = $envio->id;
+        $evaluacion->taller_entrega_id  = $envio->id;
         $evaluacion->evaluador_id       = $USER->id;
-        $evaluacion->taller_id = $taller->id;
+        $evaluacion->taller_id          = $taller->id;
         $DB->insert_record('taller_evaluacion_user', $evaluacion);
 
     }
@@ -102,20 +102,20 @@ if(count($envio) == 0){
     print_collapsible_region_end();
 
     $fs = get_file_storage();
-    $files = $fs->get_area_files($modulecontext->id, 'mod_taller', 'attachments', $envio->id);
+    $files = $fs->get_area_files($modulecontext->id, 'mod_taller', 'submission_attachment', $envio->id);
 
     $file = end($files);
-
-    $data = $taller->get_archivos_by_content_hash($file->get_contenthash(), $envio->autor_id);
     
-    $data = end($data);
-    $archivoUrl = new moodle_url("/draftfile.php/$data->contextid/user/draft/$data->itemid/$data->filename");
+    $context = $taller->context->id;
+    $filename = $file->get_filename();
+    
+    $archivoUrl = new moodle_url("/pluginfile.php/$context/mod_taller/submission_attachment/$envio->id/$filename?forcedownload=1");
     
 
     print_collapsible_region_start('','archivo','Descarga aquí el archivo a evaluar');
     echo '<div class="row">';
     echo '	<div class="col-12">';
-    echo '     <p><a class="btn btn-secondary" href="'. $archivoUrl.'">'.$data->filename.'</a></p>';
+    echo '     <p><a class="btn btn-secondary" href="'. $archivoUrl.'">'.$filename.'</a></p>';
     echo '	</div>';
     echo '</div>';
     print_collapsible_region_end();
