@@ -123,11 +123,6 @@ class taller{
         return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND autor_id = $userId;");
     }
 
-    public function get_archivos_by_content_hash($hash, $userid){
-        global $DB;
-        return $DB->get_records_sql("SELECT * FROM {files} WHERE contenthash = '$hash' AND userid = $userid ORDER BY id DESC;");
-    }
-
     public function get_evaluaciones_completas_by_userId($userId){
         global $DB;
         return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1;");
@@ -195,12 +190,4 @@ class taller{
             'return_types' => FILE_INTERNAL | FILE_EXTERNAL,
         );
     }
-
-    public function prepare_envio(stdClass $record, $showauthor = true) {
-        
-        $submission         = new taller_submission($this, $record, $showauthor);
-        $submission->url    = $this->submission_url($record->id);
-        return $submission;
-    }
-    
 }

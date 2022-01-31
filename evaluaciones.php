@@ -57,20 +57,27 @@ if($idTrabajo){
 
 }else{
     
-    $envio = $taller->get_envio_para_evaluar($USER->id);
+    $envio = $taller->get_evaluacion_pendiente_by_userId($USER->id);
+    $envio = current($envio);
 
-    if(count($envio) != 0){
+    if(!$envio){
+        $envio = $taller->get_envio_para_evaluar($USER->id);
 
-        $envio                          = current($envio);
-        $evaluacion                     = new stdClass;
-        $evaluacion->is_evaluado        = '0';
-        $evaluacion->status             = '1';
-        $evaluacion->edit_user_id       = '0';
-        $evaluacion->taller_entrega_id  = $envio->id;
-        $evaluacion->evaluador_id       = $USER->id;
-        $evaluacion->taller_id          = $taller->id;
-        $DB->insert_record('taller_evaluacion_user', $evaluacion);
+        if(count($envio) != 0){
 
+            $envio                          = current($envio);
+            $evaluacion                     = new stdClass;
+            $evaluacion->is_evaluado        = '0';
+            $evaluacion->status             = '1';
+            $evaluacion->edit_user_id       = '0';
+            $evaluacion->taller_entrega_id  = $envio->id;
+            $evaluacion->evaluador_id       = $USER->id;
+            $evaluacion->taller_id          = $taller->id;
+            $DB->insert_record('taller_evaluacion_user', $evaluacion);
+
+        }
+    }else{
+        $envio = $taller->get_envio_by_id($envio->taller_entrega_id);
     }
 }
 
@@ -87,13 +94,13 @@ if(count($envio) == 0){
     
     echo '<div class="row">';
     echo '	<div class="col-12 text-center">';
-    echo '      <h3>De momento no hay envios para evaluar vuelve un poco más tarde</h3>';
+    echo '      <h3>'. get_string('no_env', 'mod_taller') . '</h3>';
     echo '	</div>';
     echo '</div>';
 
 }else{
 
-    print_collapsible_region_start('','instrucciones-evaluacion','Instrucciones evaluacion');
+    print_collapsible_region_start('','instrucciones-evaluacion', get_string('instruc_evaluacion','mod_taller'));
     echo '<div class="row">';
     echo '	<div class="col-12">';
     echo "      <p>$taller->instruccion_valoracion</p>";
@@ -112,7 +119,7 @@ if(count($envio) == 0){
     $archivoUrl = new moodle_url("/pluginfile.php/$context/mod_taller/submission_attachment/$envio->id/$filename?forcedownload=1");
     
 
-    print_collapsible_region_start('','archivo','Descarga aquí el archivo a evaluar');
+    print_collapsible_region_start('','archivo',get_string('download_arch','mod_taller'));
     echo '<div class="row">';
     echo '	<div class="col-12">';
     echo '     <p><a class="btn btn-secondary" href="'. $archivoUrl.'">'.$filename.'</a></p>';

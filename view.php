@@ -160,8 +160,8 @@ if($taller->fase == 0){
         $urlCancel = new moodle_url('/mod/taller/view.php', array('id' => $cm->id));
         echo '<div class="row">';
         echo '	<div class="col-10 offset-1 text-center">';
-        echo "      <h3>¿Estas seguro de pasar a evaluar alumnos?</h3>";
-        echo "      <p>Una vez que empieces a evaluar a tus compañeros tu trabajo no va poder ser modificable de ninguna manera</p>";
+        echo '      <h3>get_string'. get_string('q_evaluate_alum','mod_taller'). '</h3>';
+        echo '      <p>'. get_string('adver_evaluar_alumn','mod_taller'). '</p>';
         echo '      <a class="btn btn-secondary" href="'. $urlCancel.'">'. 'Cancelar' .'</a>';
         echo '      <a class="btn btn-primary" href="'. $urlConfirm.'">'. 'Confirmar' .'</a>';
         echo '	</div>';
@@ -207,11 +207,11 @@ if($taller->fase == 0){
             print_collapsible_region_end();
             echo '<br>';
 
-            print_collapsible_region_start('','calificar','Calificar otros envios');
+            print_collapsible_region_start('','calificar', get_string('calif_ot_env','mod_taller'));
             echo '<div class="row">';
             echo '	<div class="col-12">';
             echo '      <br>';
-            echo '      <p>Una vez realizado el envio, puedes proceder a evaluar a tus compañeros</p>';
+            echo '      <p>'. get_string('info_envio','mod_taller') .'</p>';
             echo '	</div>';
             echo '</div>';
 
@@ -244,7 +244,7 @@ if($taller->fase == 0){
         $envio               = end($envio);
 
         //si  no configuramos la vista para mostrar las instrucciones de evaluacion
-        print_collapsible_region_start('','instrucciones-evaluacion','Instrucciones evaluacion');
+        print_collapsible_region_start('','instrucciones-evaluacion', get_string('instruc_evaluacion','mod_taller'));
         echo '<div class="row">';
         echo '	<div class="col-12">';
         echo "      <p>$taller->instruccion_valoracion</p>";
@@ -252,16 +252,16 @@ if($taller->fase == 0){
         echo '</div>';
         print_collapsible_region_end();
 
-        print_collapsible_region_start('','evaluaciones-hechas','Evaluaciones realizadas');
+        print_collapsible_region_start('','evaluaciones-hechas',get_string('evaluate_done','mod_taller'));
         echo '<div class="row">';
         echo '	<div class="col-12">';
         echo "      <p>Trabajos evaluados: $noEvaluaciones de $taller->no_revisiones</p>";
         echo '	</div>';
         echo '</div>';
-        
+
         if($evaluacionPendiente){
 
-            $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->entrega_id));
+            $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->taller_entrega_id));
 
         }else{
 
@@ -269,20 +269,26 @@ if($taller->fase == 0){
 
         }
         
-        echo '<a class="btn btn-primary" href="'. $url.'">'. 'Evaluar trabajo' .'</a>';
+        echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('evaluarJob','mod_taller') .'</a>';
         print_collapsible_region_end();
         echo  '<br>';
 
-        print_collapsible_region_start('','calificacion-obtenidas','Calificacion');
+        print_collapsible_region_start('','calificacion-obtenidas', get_string('calificacion','mod_taller'));
         echo '<div class="row">';
         echo '	<div class="col-12">';
+
         if($envio->no_calificaciones == $taller->no_revisiones && $noEvaluaciones == $taller->no_revisiones){
-            echo "      <p>Su calificacion final es:</p>";
+        
+            echo '      <p>'. get_string('calif_final','mod_taller') .'</p>';
             echo "      <p>$envio->calificacion</p>";
+        
         }else{
-            echo "      <p>Cuando obtenga y realice el numero de evaluaciones que se requiere se le mostrara su calificacion</p>";
+        
+            echo '      <p>'. get_string('info_calif','mod_taller') .'</p>';
             echo "      <p>Evaluaciones recibidas $envio->no_calificaciones de $taller->no_revisiones</p>";
+        
         }
+        
         echo '	</div>';
         echo '</div>';
         print_collapsible_region_end();

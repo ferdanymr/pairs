@@ -70,4 +70,15 @@ $string['setcriterios']          = 'Modificar criterios';
 $string['successenvio']          = 'a sido registado con exito';
 $string['verenvio']              = 'Ver envio';
 $string['deletenvio']            = 'Eliminar envio';
-
+$strong['q_evaluate_alum']       = '¿Estas seguro de pasar a evaluar alumnos?';
+$string['adver_evaluar_alumn']   = 'Una vez que empieces a evaluar a tus compañeros tu trabajo no va poder ser modificable de ninguna manera';
+$string['info_envio']            = 'Una vez realizado el envio, puedes proceder a evaluar a tus compañeros';
+$string['info_calif']            = 'Cuando obtenga y realice el numero de evaluaciones que se requiere se le mostrara su calificacion';
+$string['evaluarJob']            = 'Evaluar trabajo';
+$string['calif_final']           = 'Su calificacion final es:';
+$string['calif_ot_env']          = 'Calificar otros envios';
+$string['instruc_evaluacion']    = 'Instrucciones evaluacion';
+$string['evaluate_done']         = 'Evaluaciones realizadas';
+$string['calificacion']          = 'Calificación';
+$string['no_env']                = 'De momento no hay envios para evaluar vuelve un poco más tarde';
+$string['download_arch']         = 'Descarga aquí el archivo a evaluar';
