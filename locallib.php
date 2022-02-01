@@ -139,7 +139,6 @@ class taller{
     }
 
     public function get_envio_para_evaluar($userId, $evaluacionesCompletas){
-        var_dump($evaluacionesCompletas);
         global $DB;
         return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND envio_listo = 1 AND autor_id != $userId AND id NOT IN ($evaluacionesCompletas) ORDER BY no_calificaciones DESC LIMIT 1;");
     }
@@ -162,6 +161,11 @@ class taller{
     public function update_evaluacion($evaluacion){
         global $DB;
         $DB->update_record('taller_evaluacion_user', $evaluacion);
+    }
+
+    public function update_entrega($entrega){
+        global $DB;
+        $DB->update_record('taller_entrega', $entrega);
     }
 
     public function edit_opciones_criterio($opciones, $dataform, $evaluacionId){

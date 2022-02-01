@@ -37,12 +37,12 @@ class rubrica_form extends moodleform {
         $noCriterios   = count($criterios);
         $opcionSeleccionada;
         $mform->addElement('header', 'rubrica', get_string('rub','mod_taller'));
-
-        for ($i = 1; $i <= $noCriterios; $i++) { 
+        $i = 1;
+        foreach ($criterios as $criterio) { 
             
             $radioarray=array();
-        
-            $opciones = $taller->get_opciones_criterio($criterios[$i]->id);
+            
+            $opciones = $taller->get_opciones_criterio($criterio->id);
 
             foreach ($opciones as $opcion) {
 
@@ -56,7 +56,9 @@ class rubrica_form extends moodleform {
                 $mform->setDefault("opcion$i", $opcionSeleccionada);
             }
         
-            $mform->addGroup($radioarray, "criterio$i", $criterios[$i]->criterio, array(' '), false);
+            $mform->addGroup($radioarray, "criterio$i", $criterio->criterio, array(' '), false);
+            
+            $i++;
         }
 
         $this->add_action_buttons();

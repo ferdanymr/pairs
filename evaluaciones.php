@@ -106,7 +106,9 @@ if ($mform->is_cancelled()) {
     redirect($taller->url_vista());
 
 }else if ($fromform = $mform->get_data()) {
+    $envio->no_calificaciones = $envio->no_calificaciones + 1;
     $evaluacion->is_evaluado = '1';
+    $taller->update_entrega($envio);
     $taller->update_evaluacion($evaluacion);
     $taller->edit_opciones_criterio($opciones, $fromform, $evaluacion->id);
     redirect($taller->url_vista());
