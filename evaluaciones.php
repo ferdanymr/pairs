@@ -24,7 +24,7 @@
 
 require(__DIR__.'/../../config.php');
 require_once('locallib.php');
-require_once('localview/envio_form.php');
+require_once('localview/rubrica_form.php');
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -57,14 +57,31 @@ if($idTrabajo){
 
 }else{
     
-    $envio = $taller->get_evaluacion_pendiente_by_userId($USER->id);
-    $envio = current($envio);
+    $evaluacion = $taller->get_evaluacion_pendiente_by_userId($USER->id);
+    $evaluacion = current($evaluacion);
 
-    if(!$envio){
-        $envio = $taller->get_envio_para_evaluar($USER->id);
+    if(!$evaluacion){
+        
+        $evaluacionesUser    = $taller->get_evaluaciones_completas_by_userId($USER->id);
 
+        if(count($evaluacionesUser) != 0){
+
+            $ids = array();
+            foreach ($evaluacionesUser as $eva) {
+                array_push($ids, $eva->taller_entrega_id);
+            }
+
+            $ids_separados_comas = implode(",",$ids);
+
+        }else{
+            $ids = array('0');
+            $ids_separados_comas = implode(",",$ids);
+
+        }
+
+        $envio = $taller->get_envio_para_evaluar($USER->id, $ids_separados_comas);
+        
         if(count($envio) != 0){
-
             $envio                          = current($envio);
             $evaluacion                     = new stdClass;
             $evaluacion->is_evaluado        = '0';
@@ -77,8 +94,22 @@ if($idTrabajo){
 
         }
     }else{
-        $envio = $taller->get_envio_by_id($envio->taller_entrega_id);
+        $envio = $taller->get_envio_by_id($evaluacion->taller_entrega_id);
     }
+}
+
+$mform = new rubrica_form(new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id)), 
+    array('criterios' => $taller->get_criterios(), 'taller'=> $taller));
+
+if ($mform->is_cancelled()) {
+
+    redirect($taller->url_vista());
+
+}else if ($fromform = $mform->get_data()) {
+    $evaluacion->is_evaluado = '1';
+    $taller->update_evaluacion($evaluacion);
+    $taller->edit_opciones_criterio($opciones, $fromform, $evaluacion->id);
+    redirect($taller->url_vista());
 }
 
 $PAGE->set_url(new moodle_url('/mod/taller/envio.php', array('id' => $cm->id)));
@@ -126,6 +157,8 @@ if(count($envio) == 0){
     echo '	</div>';
     echo '</div>';
     print_collapsible_region_end();
+
+    $mform->display();
     
 }
 

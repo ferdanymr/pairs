@@ -125,7 +125,12 @@ class taller{
 
     public function get_evaluaciones_completas_by_userId($userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1;");
+        return $DB->get_records_sql("SELECT taller_entrega_id FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1;");
+    }
+
+    public function get_evaluacion_by_id($id){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE id = $id;");
     }
 
     public function get_evaluacion_pendiente_by_userId($userId){
@@ -133,14 +138,49 @@ class taller{
         return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 0;");
     }
 
-    public function get_envio_para_evaluar($userId){
+    public function get_envio_para_evaluar($userId, $evaluacionesCompletas){
+        var_dump($evaluacionesCompletas);
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND envio_listo = 1 AND autor_id != $userId ORDER BY no_calificaciones DESC LIMIT 1;");
+        return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND envio_listo = 1 AND autor_id != $userId AND id NOT IN ($evaluacionesCompletas) ORDER BY no_calificaciones DESC LIMIT 1;");
     }
 
     public function get_envio_by_id($id){
         global $DB;
         return $DB->get_record_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND id = $id;");
+    }
+
+    public function get_criterios(){
+        global $DB;
+        return  $DB->get_records_sql("SELECT * FROM {taller_criterio} WHERE taller_id = $this->id;");
+    }
+
+    public function get_opciones_criterio($criterioId){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} WHERE taller_criterio_id = $criterioId;");
+    }
+
+    public function update_evaluacion($evaluacion){
+        global $DB;
+        $DB->update_record('taller_evaluacion_user', $evaluacion);
+    }
+
+    public function edit_opciones_criterio($opciones, $dataform, $evaluacionId){
+        global $DB;
+        
+        if($opciones){
+            var_dump($opciones);
+        }else{
+            
+            foreach ($dataform as $opcion) {
+                
+                if($opcion !== "Guardar cambios"){
+                    $data->taller_opcion_cri_id      = $opcion;
+                    $data->taller_evaluacion_user_id = $evaluacionId;
+                    $DB->insert_record('taller_respuesta_rubrica', $data);
+                }
+            }
+
+        }
     }
 
     public function edit_envio($data){
