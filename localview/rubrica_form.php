@@ -49,14 +49,14 @@ class rubrica_form extends moodleform {
                 $radioarray[] = $mform->createElement('radio', "opcion$i", '', $opcion->definicion, $opcion->id, $attributes);
                 $opcionSeleccionada = $opcion->id;
             }
-            
-            if($opcionesSelec[$i]){
-                $mform->setDefault("opcion$i", $opcionesSelec[$i]->id);
+
+            if($opcionesSelec[$i - 1]){
+                $mform->setDefault("opcion$i", $opcionesSelec[$i - 1]->taller_opcion_cri_id);
             }else{
                 $mform->setDefault("opcion$i", $opcionSeleccionada);
             }
         
-            $mform->addGroup($radioarray, "criterio$i", $criterio->criterio, array(' '), false);
+            $mform->addGroup($radioarray, "criterio$i", $criterio->criterio, array(''), false);
             
             $i++;
         }

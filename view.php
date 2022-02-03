@@ -148,12 +148,17 @@ $PAGE->set_context($taller->context);
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($course->name));
 
-//Si la fase es 0 siginifa configuracion entonces mostramos el formulario
+/////////////////////////////////////////////////////////////////////////////////////////////////
+//Si la fase es 0 siginifa configuracion entonces mostramos el formulario                      //
+/////////////////////////////////////////////////////////////////////////////////////////////////
 if($taller->fase == 0){ 
     
     $mform->display();
 
 }else{
+    /////////////////////////////////////////////////////////////////////////////////////////////////
+    //pantalla de confirmacion para pasar a la fase de evaluacion                                  //
+    /////////////////////////////////////////////////////////////////////////////////////////////////
     if($confirm_env == 1){
 
         $urlConfirm = new moodle_url('/mod/taller/view.php', array('id' => $cm->id, 'confirm_env' => '2'));
@@ -168,13 +173,18 @@ if($taller->fase == 0){
         echo '</div>';
 
     }else if($confirm_env == 2){
-        
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //se confirma el cambio de fase                                                                //
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+
         $envio->envio_listo = '1';
         $DB->update_record('taller_entrega', $envio);
         redirect(new moodle_url('/mod/taller/view.php', array('id' => $cm->id)));
 
     }else if($envio->envio_listo != 1){
-        
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //pantalla para mostrar informacion de subida de archivo                                       //
+        /////////////////////////////////////////////////////////////////////////////////////////////////
         //si  no configuramos la vista para mostrar los envios
         print_collapsible_region_start('','instrucciones-envio',get_string('param_inst','mod_taller'));
         echo '<div class="row">';
@@ -235,6 +245,9 @@ if($taller->fase == 0){
         }
 
     }else if($envio->envio_listo == 1){
+        /////////////////////////////////////////////////////////////////////////////////////////////////
+        //pantalla de evaluacion de tareas                                                             //
+        /////////////////////////////////////////////////////////////////////////////////////////////////
         
         $evaluacionesUser    = $taller->get_evaluaciones_completas_by_userId($USER->id);
         $noEvaluaciones      = count($evaluacionesUser);
@@ -259,17 +272,36 @@ if($taller->fase == 0){
         echo '	</div>';
         echo '</div>';
 
-        if($evaluacionPendiente){
+        if($noEvaluaciones != 0){
+            echo '<ul>';
+            $contador = 1;
+            foreach($evaluacionesUser as $edit){
+                echo '<li>';
+                $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id,
+                    'trabajo' => $edit->taller_entrega_id, 'edit' => '1'));
+                echo '  <a href="'. $url.'">Editar evaluación numero '. $contador.'</a>';
+                echo '</li>';
+                $contador++;
+            }
+            echo '</ul>';
+        }
 
-            $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->taller_entrega_id));
+        if($noEvaluaciones != $taller->no_revisiones){
 
-        }else{
+            if($evaluacionPendiente){
 
-            $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id));
+                $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->taller_entrega_id));
+    
+            }else{
+    
+                $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id));
+    
+            }
+            
+            echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('evaluarJob','mod_taller') .'</a>';
 
         }
         
-        echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('evaluarJob','mod_taller') .'</a>';
         print_collapsible_region_end();
         echo  '<br>';
 

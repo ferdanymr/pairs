@@ -128,6 +128,11 @@ class taller{
         return $DB->get_records_sql("SELECT taller_entrega_id FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1;");
     }
 
+    public function get_evaluacion_completa_by_entregaId($entregaId, $userId){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1 AND taller_entrega_id = $entregaId;");
+    }
+
     public function get_evaluacion_by_id($id){
         global $DB;
         return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE id = $id;");
@@ -138,6 +143,10 @@ class taller{
         return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 0;");
     }
 
+    public function get_respuestas_evaluacion($evaluacionId){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {taller_respuesta_rubrica} WHERE taller_evaluacion_user_id = $evaluacionId ORDER BY id ASC;");
+    }
     public function get_envio_para_evaluar($userId, $evaluacionesCompletas){
         global $DB;
         return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND envio_listo = 1 AND autor_id != $userId AND id NOT IN ($evaluacionesCompletas) ORDER BY no_calificaciones DESC LIMIT 1;");
@@ -172,7 +181,18 @@ class taller{
         global $DB;
         
         if($opciones){
-            var_dump($opciones);
+            $contador = 0;
+            foreach ($dataform as $opcion) {
+                
+                if($opcion !== "Guardar cambios"){
+                    $data->id                        = $opciones[$contador]->id;
+                    $data->taller_opcion_cri_id      = $opcion;
+                    $data->taller_evaluacion_user_id = $evaluacionId;
+                    $DB->update_record('taller_respuesta_rubrica', $data);
+                }
+                $contador++;
+            }
+
         }else{
             
             foreach ($dataform as $opcion) {

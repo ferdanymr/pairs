@@ -34,6 +34,8 @@ $id = optional_param('id', 0, PARAM_INT);
 
 $idTrabajo = optional_param('trabajo', 0, PARAM_INT);
 
+$edit = optional_param('edit', 0, PARAM_INT);
+
 $e  = optional_param('e', 0, PARAM_INT);
 
 if ($id) {
@@ -98,19 +100,38 @@ if($idTrabajo){
     }
 }
 
-$mform = new rubrica_form(new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id)), 
-    array('criterios' => $taller->get_criterios(), 'taller'=> $taller));
+if($edit){
+
+    $evaluacion = $taller->get_evaluacion_completa_by_entregaId($envio->id, $USER->id);
+    $evaluacion = current($evaluacion);
+    $opcionesSelec = $taller->get_respuestas_evaluacion($evaluacion->id);
+    $opcionesSelec = array_values($opcionesSelec);
+
+    $mform = new rubrica_form(new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $idTrabajo, 'edit' => '1')), 
+    array('criterios' => $taller->get_criterios(), 'taller'=> $taller, 'opcionesSelec' => $opcionesSelec));
+
+}else{
+
+    $mform = new rubrica_form(new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id)), 
+    array('criterios' => $taller->get_criterios(), 'taller'=> $taller, 'opcionesSelec' => $opcionesSelec));
+
+}
 
 if ($mform->is_cancelled()) {
 
     redirect($taller->url_vista());
 
 }else if ($fromform = $mform->get_data()) {
-    $envio->no_calificaciones = $envio->no_calificaciones + 1;
-    $evaluacion->is_evaluado = '1';
-    $taller->update_entrega($envio);
-    $taller->update_evaluacion($evaluacion);
-    $taller->edit_opciones_criterio($opciones, $fromform, $evaluacion->id);
+    if(!$edit){
+
+        $envio->no_calificaciones = $envio->no_calificaciones + 1;
+        $taller->update_entrega($envio);
+        $evaluacion->is_evaluado = '1';
+        $taller->update_evaluacion($evaluacion);
+
+    }
+
+    $taller->edit_opciones_criterio($opcionesSelec, $fromform, $evaluacion->id);
     redirect($taller->url_vista());
 }
 
