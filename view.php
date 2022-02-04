@@ -165,7 +165,7 @@ if($taller->fase == 0){
         $urlCancel = new moodle_url('/mod/taller/view.php', array('id' => $cm->id));
         echo '<div class="row">';
         echo '	<div class="col-10 offset-1 text-center">';
-        echo '      <h3>get_string'. get_string('q_evaluate_alum','mod_taller'). '</h3>';
+        echo '      <h3>'. get_string('qevaluate_alum','mod_taller'). '</h3>';
         echo '      <p>'. get_string('adver_evaluar_alumn','mod_taller'). '</p>';
         echo '      <a class="btn btn-secondary" href="'. $urlCancel.'">'. 'Cancelar' .'</a>';
         echo '      <a class="btn btn-primary" href="'. $urlConfirm.'">'. 'Confirmar' .'</a>';

@@ -118,11 +118,13 @@ if($envio->id && !$edit){
     
     $file = end($files);
     
+    $context = $taller->context->id;
+    $filename = $file->get_filename();
+    
+    $archivoUrl = new moodle_url("/pluginfile.php/$context/mod_taller/submission_attachment/$envio->id/$filename?forcedownload=1");
+
     echo '<h3>Su envio:</h3>';
-
-    $archivoUrl = new moodle_url("/draftfile.php/$file->contextid/user/draft/$file->itemid/$file->filename");
-
-    echo '<a class="btn btn-secondary" href="'. $archivoUrl.'">'.$file->filename.'</a>';
+    echo '<a class="btn btn-secondary" href="'. $archivoUrl.'">'.$filename.'</a>';
     echo '<br>';
     echo '<br>';
     $url = new moodle_url('/mod/taller/envio.php', array('id' => $cm->id, 'env'=>$envio->id, 'edit'=>'1'));
