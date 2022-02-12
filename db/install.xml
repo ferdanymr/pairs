@@ -26,6 +26,7 @@
                 <FIELD NAME="instruccion_valoracion" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Intrucciones para la valoracion"/>
                 <FIELD NAME="instruccion_valoracionformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
                 <FIELD NAME="no_revisiones" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Numero de revisiones"/>
+                <FIELD NAME="puntos_max_rubrica" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Numero de puntos maximos que se daran en la rubrica"/>
                 <FIELD NAME="retro_conclusion" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Texto para la retro"/>
                 <FIELD NAME="retro_conclusionformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
                 <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al curso"/>

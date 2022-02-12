@@ -182,6 +182,21 @@ class taller{
         return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND taller_entrega_id = $envioId;");
     }
 
+    public function set_puntos_totales_rubrica(){
+        global $DB;
+        $criterios = $this->get_criterios();
+        $puntos = 0;
+        
+        foreach($criterios as $criterio){
+            $p = $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} WHERE taller_criterio_id = $criterio->id ORDER BY calificacion DESC LIMIT 1;");
+            $p = current($p);
+            $puntos +=  $p->calificacion;
+        }
+
+        $this->dbrecord->puntos_max_rubrica = $puntos;
+        $DB->update_record('taller', $this->dbrecord, $bulk=false);
+    }
+
     public function asignar_calif_final($envio){
         $evaluaciones = $this->get_evaluaciones_by_envioId($envio->id);
         var_dump($envio, $evaluaciones);
@@ -278,4 +293,131 @@ class taller{
             'return_types' => FILE_INTERNAL | FILE_EXTERNAL,
         );
     }
+
+    public function editar_opciones_criterio($fromform, $idCriterio, $i){
+        global $DB;
+        $opcionCriterio = new stdClass();
+        
+        for($j = 1; $j <= 4; $j++){
+            $definicion                              = "calif_def$i$j";
+            $calificacion                            = "calif_envio$i$j";
+            $opcionid                                = "opcionid$i$j";
+
+            if(strlen($fromform->$opcionid) != 0){
+            
+                $opcionCriterio->id                 = $fromform->$opcionid;
+                $opcionCriterio->definicion         = $fromform->$definicion;
+                $opcionCriterio->calificacion       = $fromform->$calificacion;
+                $opcionCriterio->taller_criterio_id = $idCriterio;
+                $DB->update_record('taller_opcion_cri', $opcionCriterio, $bulk=false);
+            
+            }else{
+            
+                if(strlen($fromform->$definicion) != 0){
+
+                    $opcionCriterio->definicion         = $fromform->$definicion;
+                    $opcionCriterio->calificacion       = $fromform->$calificacion;
+                    $opcionCriterio->taller_criterio_id = $idCriterio;
+
+                    $DB->insert_record('taller_opcion_cri', $opcionCriterio);
+
+                }
+
+            }
+        }
+        
+        $this->set_puntos_totales_rubrica();
+
+    }
+
+    public function add_opciones_criterio($fromform, $idCriterio, $i){
+        global $DB;
+        $opcionCriterio = new stdClass();
+        
+        for($j = 1; $j <= 4; $j++){
+
+            $definicion = "calif_def$i$j";
+            
+            if(strlen($fromform->$definicion) != 0){
+                $calificacion                       = "calif_envio$i$j";
+                $opcionCriterio->definicion         = $fromform->$definicion;
+                $opcionCriterio->calificacion       = $fromform->$calificacion;
+                $opcionCriterio->taller_criterio_id = $idCriterio;
+
+                $DB->insert_record('taller_opcion_cri', $opcionCriterio);
+
+            }
+        
+        }
+
+        $this->set_puntos_totales_rubrica();
+
+    }
+
+    public function add_criterios($fromform, $noAspectos){
+        global $DB;
+        $criterio       = new stdClass();
+    
+        for($i = 1; $i <= $noAspectos-2; $i++){
+
+            $des         = "descripcion$i";
+            $descripcion = $fromform->$des;
+            
+            if(strlen($descripcion['text']) != 0){
+                
+                $criterio->criterio           = $descripcion['text'];
+                $criterio->criterioformat     = $descripcion['format'];
+                $criterio->taller_id = $this->id;
+                var_dump($criterio);
+                $idCriterio                   = $DB->insert_record('taller_criterio', $criterio);
+
+                $this->add_opciones_criterio($fromform, $idCriterio, $i);
+            }
+        }
+
+    }
+
+    
+
+    public function edit_criterios($fromform, $noAspectos, $data){
+        global $DB;
+        $criterio       = new stdClass();
+
+        for($i = 1; $i <= count($data); $i++){
+            $des                          = "descripcion$i";
+            $descripcionid                = "descripcionid$i";
+            $descripcion                  = $fromform->$des;
+            $criterio->id                 = $fromform->$descripcionid;
+            $criterio->criterio           = $descripcion['text'];
+            $criterio->criterioformat     = $descripcion['format'];
+            $criterio->taller_id = $this->id; 
+            $DB->update_record('taller_criterio', $criterio, $bulk=false);
+
+            $this->editar_opciones_criterio($fromform, $criterio->id, $i);
+        }
+
+        if($noAspectos-2 != count($data)){
+        
+            for($i = count($data)+1; $i <= $noAspectos-2; $i++){
+
+                $des         = "descripcion$i";
+                $descripcion = $fromform->$des;
+
+                if(strlen($descripcion['text']) != 0){
+
+                    $criterio->criterio           = $descripcion['text'];
+                    $criterio->criterioformat     = $descripcion['format'];
+                    $criterio->taller_id          = $this->id;
+                    $idCriterio                   = $DB->insert_record('taller_criterio', $criterio);
+
+                    $this->add_opciones_criterio($fromform, $idCriterio, $i);
+
+                }
+
+            }
+
+        }
+    }
+
+    
 }

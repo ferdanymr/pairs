@@ -80,83 +80,8 @@ if ($mform->is_cancelled()) {
     redirect(new moodle_url('/mod/taller/view.php', array('id' => $cm->id)));
 
 } else if ($fromform = $mform->get_data()) {
-    $criterio       = new stdClass();
-    $opcionCriterio = new stdClass();
-
-    for($i = 1; $i <= count($data); $i++){
-        $des                          = "descripcion$i";
-        $descripcionid                = "descripcionid$i";
-        $descripcion                  = $fromform->$des;
-        $criterio->id                 = $fromform->$descripcionid;
-        $criterio->criterio           = $descripcion['text'];
-        $criterio->criterioformat     = $descripcion['format'];
-        $criterio->taller_id = $taller->id; 
-        $DB->update_record('taller_criterio', $criterio, $bulk=false);
-        
-        for($j = 1; $j <= 4; $j++){
-            $definicion                              = "calif_def$i$j";
-            $calificacion                            = "calif_envio$i$j";
-            $opcionid                                = "opcionid$i$j";
-            
-            if(strlen($fromform->$opcionid) != 0){
-            
-                $opcionCriterio->id                      = $fromform->$opcionid;
-                $opcionCriterio->definicion              = $fromform->$definicion;
-                $opcionCriterio->calificacion            = $fromform->$calificacion;
-                $opcionCriterio->taller_criterio_id = $criterio->id;
-                $DB->update_record('taller_opcion_cri', $opcionCriterio, $bulk=false);
-            
-            }else{
-            
-                if(strlen($fromform->$definicion) != 0){
-                    
-                    $opcionCriterio->definicion              = $fromform->$definicion;
-                    $opcionCriterio->calificacion            = $fromform->$calificacion;
-                    $opcionCriterio->taller_criterio_id = $criterio->id;
-
-                    $DB->insert_record('taller_opcion_cri', $opcionCriterio);
-
-                }
-
-            }
-        }
-    }
     
-    if($noAspectos-2 != count($data)){
-    
-        for($i = count($data)+1; $i <= $noAspectos-2; $i++){
-
-            $des         = "descripcion$i";
-            $descripcion = $fromform->$des;
-            
-            if(strlen($descripcion['text']) != 0){
-                
-                $criterio->criterio           = $descripcion['text'];
-                $criterio->criterioformat     = $descripcion['format'];
-                $criterio->taller_id = $taller->id;
-                $idCriterio                   = $DB->insert_record('taller_criterio', $criterio);
-                
-                for($j = 1; $j <= 4; $j++){
-
-                    $definicion = "calif_def$i$j";
-                    
-                    if(strlen($fromform->$definicion) != 0){
-                        $calificacion                            = "calif_envio$i$j";
-                        $opcionCriterio->definicion              = $fromform->$definicion;
-                        $opcionCriterio->calificacion            = $fromform->$calificacion;
-                        $opcionCriterio->taller_criterio_id = $idCriterio;
-
-                        $DB->insert_record('taller_opcion_cri', $opcionCriterio);
-
-                    }
-    
-                }
-
-            }
-
-        }
-
-    }
+    $taller->edit_criterios($fromform, $noAspectos, $data);
     
     redirect(new moodle_url('/mod/taller/view.php', array('id' => $cm->id)),"Actualizacion exitosa");
 

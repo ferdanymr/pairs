@@ -82,39 +82,7 @@ if($taller->fase == 0){
 
     }else if ($fromform = $mform->get_data()) {
         //si se hace submit se preparan los datos para insertarlos en la Base de Datos        
-        $criterio       = new stdClass();
-        $opcionCriterio = new stdClass();
-    
-        for($i = 1; $i <= $noAspectos-2; $i++){
-
-            $des         = "descripcion$i";
-            $descripcion = $fromform->$des;
-            
-            if(strlen($descripcion['text']) != 0){
-                
-                $criterio->criterio           = $descripcion['text'];
-                $criterio->criterioformat     = $descripcion['format'];
-                $criterio->taller_id = $taller->id;
-                $idCriterio                   = $DB->insert_record('taller_criterio', $criterio);
-                
-                for($j = 1; $j <= 4; $j++){
-
-                    $definicion = "calif_def$i$j";
-                    
-                    if(strlen($fromform->$definicion) != 0){
-                        $calificacion                            = "calif_envio$i$j";
-                        $opcionCriterio->definicion              = $fromform->$definicion;
-                        $opcionCriterio->calificacion            = $fromform->$calificacion;
-                        $opcionCriterio->taller_criterio_id = $idCriterio;
-
-                        $DB->insert_record('taller_opcion_cri', $opcionCriterio);
-
-                    }
-    
-                }
-
-            }
-        }
+        $taller->add_criterios($fromform, $noAspectos);
         
         $moduleinstance->fase = 1;
         $DB->update_record('taller', $moduleinstance, $bulk=false);
