@@ -46,14 +46,25 @@ class rubrica_form extends moodleform {
 
             foreach ($opciones as $opcion) {
 
-                $radioarray[] = $mform->createElement('radio', "opcion$i", '', $opcion->definicion, $opcion->id, $attributes);
-                $opcionSeleccionada = $opcion->id;
+                $radioarray[] = $mform->createElement('radio', "opcion$i", '', $opcion->definicion, "$opcion->id-$opcion->calificacion", $attributes);
+                $opcionSeleccionada = $opcion->id .'-'.$opcion->calificacion;
+                
+                if($opcionesSelec[$i - 1]){
+                    
+                    if($opcionesSelec[$i - 1]->taller_opcion_cri_id == $opcion->id){
+                        $op = $opcion->id .'-'.$opcion->calificacion;
+                    }
+
+                }
+
             }
 
             if($opcionesSelec[$i - 1]){
-                $mform->setDefault("opcion$i", $opcionesSelec[$i - 1]->taller_opcion_cri_id);
+                
+                $mform->setDefault("opcion$i", $op);
+                
             }else{
-                $mform->setDefault("opcion$i", $opcionSeleccionada);
+                $mform->setDefault("opcion$i", "$opcionSeleccionada");
             }
         
             $mform->addGroup($radioarray, "criterio$i", $criterio->criterio, array(''), false);

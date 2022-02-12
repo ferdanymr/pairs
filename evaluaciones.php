@@ -87,6 +87,7 @@ if($idTrabajo){
             $envio                          = current($envio);
             $evaluacion                     = new stdClass;
             $evaluacion->is_evaluado        = '0';
+            $evaluacion->calificacion       = '0';
             $evaluacion->status             = '1';
             $evaluacion->edit_user_id       = '0';
             $evaluacion->taller_entrega_id  = $envio->id;
@@ -122,16 +123,8 @@ if ($mform->is_cancelled()) {
     redirect($taller->url_vista());
 
 }else if ($fromform = $mform->get_data()) {
-    if(!$edit){
 
-        $envio->no_calificaciones = $envio->no_calificaciones + 1;
-        $taller->update_entrega($envio);
-        $evaluacion->is_evaluado = '1';
-        $taller->update_evaluacion($evaluacion);
-
-    }
-
-    $taller->edit_opciones_criterio($opcionesSelec, $fromform, $evaluacion->id);
+    $taller->edit_opciones_criterio($opcionesSelec, $fromform, $evaluacion, $envio);
     redirect($taller->url_vista());
 }
 

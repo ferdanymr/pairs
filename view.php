@@ -256,76 +256,84 @@ if($taller->fase == 0){
         $envio               = $taller->get_envio_by_userId($USER->id);
         $envio               = end($envio);
 
-        //si  no configuramos la vista para mostrar las instrucciones de evaluacion
-        print_collapsible_region_start('','instrucciones-evaluacion', get_string('instruc_evaluacion','mod_taller'));
-        echo '<div class="row">';
-        echo '	<div class="col-12">';
-        echo "      <p>$taller->instruccion_valoracion</p>";
-        echo '	</div>';
-        echo '</div>';
-        print_collapsible_region_end();
-
-        print_collapsible_region_start('','evaluaciones-hechas',get_string('evaluate_done','mod_taller'));
-        echo '<div class="row">';
-        echo '	<div class="col-12">';
-        echo "      <p>Trabajos evaluados: $noEvaluaciones de $taller->no_revisiones</p>";
-        echo '	</div>';
-        echo '</div>';
-
-        if($noEvaluaciones != 0){
-            echo '<ul>';
-            $contador = 1;
-            foreach($evaluacionesUser as $edit){
-                echo '<li>';
-                $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id,
-                    'trabajo' => $edit->taller_entrega_id, 'edit' => '1'));
-                echo '  <a href="'. $url.'">Editar evaluación numero '. $contador.'</a>';
-                echo '</li>';
-                $contador++;
-            }
-            echo '</ul>';
-        }
-
-        if($noEvaluaciones != $taller->no_revisiones){
-
-            if($evaluacionPendiente){
-
-                $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->taller_entrega_id));
-    
-            }else{
-    
-                $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id));
-    
-            }
-            
-            echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('evaluarJob','mod_taller') .'</a>';
-
-        }
-        
-        print_collapsible_region_end();
-        echo  '<br>';
-
-        print_collapsible_region_start('','calificacion-obtenidas', get_string('calificacion','mod_taller'));
-        echo '<div class="row">';
-        echo '	<div class="col-12">';
-
         if($envio->no_calificaciones == $taller->no_revisiones && $noEvaluaciones == $taller->no_revisiones){
-        
-            echo '      <p>'. get_string('calif_final','mod_taller') .'</p>';
-            echo "      <p>$envio->calificacion</p>";
-        
+            
+            $taller->asignar_calif_final($envio);
+
         }else{
-        
-            echo '      <p>'. get_string('info_calif','mod_taller') .'</p>';
-            echo "      <p>Evaluaciones recibidas $envio->no_calificaciones de $taller->no_revisiones</p>";
-        
+
+            //si  no configuramos la vista para mostrar las instrucciones de evaluacion
+            print_collapsible_region_start('','instrucciones-evaluacion', get_string('instruc_evaluacion','mod_taller'));
+            echo '<div class="row">';
+            echo '	<div class="col-12">';
+            echo "      <p>$taller->instruccion_valoracion</p>";
+            echo '	</div>';
+            echo '</div>';
+            print_collapsible_region_end();
+
+            print_collapsible_region_start('','evaluaciones-hechas',get_string('evaluate_done','mod_taller'));
+            echo '<div class="row">';
+            echo '	<div class="col-12">';
+            echo "      <p>Trabajos evaluados: $noEvaluaciones de $taller->no_revisiones</p>";
+            echo '	</div>';
+            echo '</div>';
+
+            if($noEvaluaciones != 0){
+                echo '<ul>';
+                $contador = 1;
+                foreach($evaluacionesUser as $edit){
+                    echo '<li>';
+                    $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id,
+                        'trabajo' => $edit->taller_entrega_id, 'edit' => '1'));
+                    echo '  <a href="'. $url.'">Editar evaluación numero '. $contador.'</a>';
+                    echo '</li>';
+                    $contador++;
+                }
+                echo '</ul>';
+            }
+
+            if($noEvaluaciones != $taller->no_revisiones){
+
+                if($evaluacionPendiente){
+
+                    $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->taller_entrega_id));
+                
+                }else{
+                
+                    $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id));
+                
+                }
+
+                echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('evaluarJob','mod_taller') .'</a>';
+
+            }
+
+            print_collapsible_region_end();
+            echo  '<br>';
+
+            print_collapsible_region_start('','calificacion-obtenidas', get_string('calificacion','mod_taller'));
+            echo '<div class="row">';
+            echo '	<div class="col-12">';
+
+            if($envio->no_calificaciones == $taller->no_revisiones && $noEvaluaciones == $taller->no_revisiones){
+            
+                echo '      <p>'. get_string('calif_final','mod_taller') .'</p>';
+                echo "      <p>$envio->calificacion</p>";
+            
+            }else{
+            
+                echo '      <p>'. get_string('info_calif','mod_taller') .'</p>';
+                echo "      <p>Evaluaciones recibidas $envio->no_calificaciones de $taller->no_revisiones</p>";
+            
+            }
+
+            echo '	</div>';
+            echo '</div>';
+            print_collapsible_region_end();
+
         }
-        
-        echo '	</div>';
-        echo '</div>';
-        print_collapsible_region_end();
     }
-    
+
     echo '<br>';
     $url = new moodle_url('/mod/taller/aspectos.php', array('cmid' => $cm->id));
     echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('setcriterios','mod_taller').'</a>';

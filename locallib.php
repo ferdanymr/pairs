@@ -177,17 +177,30 @@ class taller{
         $DB->update_record('taller_entrega', $entrega);
     }
 
-    public function edit_opciones_criterio($opciones, $dataform, $evaluacionId){
+    public function get_evaluaciones_by_envioId($envioId){
         global $DB;
-        
+        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND taller_entrega_id = $envioId;");
+    }
+
+    public function asignar_calif_final($envio){
+        $evaluaciones = $this->get_evaluaciones_by_envioId($envio->id);
+        var_dump($envio, $evaluaciones);
+    }
+
+    public function edit_opciones_criterio($opciones, $dataform, $evaluacion, $envio){
+        global $DB;
+        $calificacion = 0;
         if($opciones){
             $contador = 0;
             foreach ($dataform as $opcion) {
                 
-                if($opcion !== "Guardar cambios"){
+                $opcion = explode("-", $opcion);
+                $calificacion += $opcion[1];
+
+                if($opcion[0] !== "Guardar cambios"){
                     $data->id                        = $opciones[$contador]->id;
-                    $data->taller_opcion_cri_id      = $opcion;
-                    $data->taller_evaluacion_user_id = $evaluacionId;
+                    $data->taller_opcion_cri_id      = $opcion[0];
+                    $data->taller_evaluacion_user_id = $evaluacion->id;
                     $DB->update_record('taller_respuesta_rubrica', $data);
                 }
                 $contador++;
@@ -197,14 +210,25 @@ class taller{
             
             foreach ($dataform as $opcion) {
                 
-                if($opcion !== "Guardar cambios"){
-                    $data->taller_opcion_cri_id      = $opcion;
-                    $data->taller_evaluacion_user_id = $evaluacionId;
+                $opcion = explode("-", $opcion);
+                $calificacion += $opcion[1];
+                
+                if($opcion[0] !== "Guardar cambios"){
+                    $data->taller_opcion_cri_id      = $opcion[0];
+                    $data->taller_evaluacion_user_id = $evaluacion->id;
                     $DB->insert_record('taller_respuesta_rubrica', $data);
                 }
+                
             }
 
+            $envio->no_calificaciones = $envio->no_calificaciones + 1;
+            $this->update_entrega($envio);
+            $evaluacion->is_evaluado = '1';
         }
+
+        $evaluacion->calificacion = $calificacion;
+        $this->update_evaluacion($evaluacion);
+
     }
 
     public function edit_envio($data){
