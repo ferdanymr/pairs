@@ -84,6 +84,8 @@ class taller{
     public $retro_conclusionformat;
 
     public $context;
+
+    public $puntos_max_rubrica;
     
     public function __construct(stdclass $dbrecord, $cm, $course, stdclass $context=null) {
         $this->dbrecord = $dbrecord;
@@ -198,8 +200,38 @@ class taller{
     }
 
     public function asignar_calif_final($envio){
+        global $DB;
+        //las evaluaciones que ha recibido el trabajo junto con su calificacion
         $evaluaciones = $this->get_evaluaciones_by_envioId($envio->id);
-        var_dump($envio, $evaluaciones);
+        $calificacion = 0;
+        
+        foreach ($evaluaciones as $evaluacion) {
+            
+            $calificacion += $evaluacion->calificacion;
+
+        }
+
+        //la sumatoria de las evaluaciones sobre el numero de revisiones
+        $calificacion = $calificacion /  $this->no_revisiones;
+        
+        $calificacion = $calificacion * $this->calif_envio; 
+
+        //calificacion total del envio
+        $calificacion = $calificacion / $this->puntos_max_rubrica;
+        
+        //calificacion del envio más la calificacion de valoracion
+        $calificacion += $this->calif_valoracion;
+
+        //escala sobre 10
+        $calificacion /= 10;
+
+        $calificacion = round($calificacion, $this->no_decimales);
+
+        $envio->calificacion = $calificacion;
+
+        $envio->envio_listo = 2;
+
+        $DB->update_record('taller_entrega', $envio);
     }
 
     public function edit_opciones_criterio($opciones, $dataform, $evaluacion, $envio){

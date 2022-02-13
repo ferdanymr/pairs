@@ -149,7 +149,7 @@ if($taller->fase == 0){
         $DB->update_record('taller_entrega', $envio);
         redirect(new moodle_url('/mod/taller/view.php', array('id' => $cm->id)));
 
-    }else if($envio->envio_listo != 1){
+    }else if($envio->envio_listo == 0){
         /////////////////////////////////////////////////////////////////////////////////////////////////
         //pantalla para mostrar informacion de subida de archivo                                       //
         /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -227,6 +227,7 @@ if($taller->fase == 0){
         if($envio->no_calificaciones == $taller->no_revisiones && $noEvaluaciones == $taller->no_revisiones){
             
             $taller->asignar_calif_final($envio);
+            redirect($taller->url_vista());
 
         }else{
 
@@ -300,6 +301,10 @@ if($taller->fase == 0){
             print_collapsible_region_end();
 
         }
+    } else if ($envio->envio_listo == 2) {
+        echo '<h2 class="text-center">Tu calificacion final es</h2>';
+        $calificacion = round($envio->calificacion,$taller->no_decimales);
+        echo "<h4 class='text-center'>$calificacion</h4>";
     }
 
     echo '<br>';
