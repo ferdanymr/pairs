@@ -227,6 +227,7 @@ if($taller->fase == 0){
         if($envio->no_calificaciones == $taller->no_revisiones && $noEvaluaciones == $taller->no_revisiones){
             
             $taller->asignar_calif_final($envio);
+            $taller->mandar_calificacion_gradebook($envio->autor_id);
             redirect($taller->url_vista());
 
         }else{

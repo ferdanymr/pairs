@@ -129,20 +129,20 @@ function taller_delete_instance($id) {
 }
 
 /**
- * Serves the files from the workshop file areas
+ * Serves the files from the taller file areas
  *
- * Apart from module intro (handled by pluginfile.php automatically), workshop files may be
+ * Apart from module intro (handled by pluginfile.php automatically), taller files may be
  * media inserted into submission content (like images) and submission attachments. For these two,
  * the fileareas submission_content and submission_attachment are used.
  * Besides that, areas instructauthors, instructreviewers and conclusion contain the media
  * embedded using the mod_form.php.
  *
- * @package  mod_workshop
+ * @package  mod_taller
  * @category files
  *
  * @param stdClass $course the course object
  * @param stdClass $cm the course module object
- * @param stdClass $context the workshop's context
+ * @param stdClass $context the taller's context
  * @param string $filearea the name of the file area
  * @param array $args extra arguments (itemid, path)
  * @param bool $forcedownload whether or not force download
@@ -180,4 +180,66 @@ function taller_pluginfile($course, $cm, $context, $filearea, array $args, $forc
     }
 
     return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Gradebook API                                                              //
+////////////////////////////////////////////////////////////////////////////////
+
+/**
+ * Creates or updates grade items for the give taller instance
+ *
+ * Needed by grade_update_mod_grades() in lib/gradelib.php. Also used by
+ * {@link taller_update_grades()}.
+ *
+ * @param stdClass $taller instance object with extra cmidnumber property
+ * @param stdClass $envio data for the first grade item
+ * @param stdClass $assessmentgrades data for the second grade item
+ * @return void
+ */
+function taller_grade_item_update(stdclass $taller, $envio=null) {
+    global $CFG;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    $a = new stdclass();
+    $a->tallername = clean_param($taller->name, PARAM_NOTAGS);
+
+    $item = array();
+    $item['itemname'] = $a->tallername;
+    $item['gradetype'] = GRADE_TYPE_VALUE;
+    $item['grademax']  = 10.00;
+    $item['grademin']  = 0;
+    grade_update('mod/taller', $taller->course, 'mod', 'taller', $taller->id, 0, $envio , $item);
+}
+
+/**
+ * Update taller grades in the gradebook
+ *
+ * Needed by grade_update_mod_grades() in lib/gradelib.php
+ *
+ * @category grade
+ * @param stdClass $taller instance object with extra cmidnumber and modname property
+ * @param int $userid        update grade of specific user only, 0 means all participants
+ * @return void
+ */
+function taller_update_grades(stdclass $taller, $userid=0) {
+    global $CFG, $DB;
+    require_once($CFG->libdir.'/gradelib.php');
+
+    $whereuser = $userid ? ' AND autor_id = :userid' : '';
+    $params = array('taller_id' => $taller->id, 'userid' => $userid);
+    $sql = 'SELECT autor_id, calificacion
+              FROM {taller_entrega}
+             WHERE taller_id = :taller_id' . $whereuser;
+    $records = $DB->get_records_sql($sql, $params);
+    $envio = array();
+    foreach ($records as $record) {
+        $grade = new stdclass();
+        $grade->userid = $record->autor_id;
+        $calificacion = round($record->calificacion,$taller->no_decimales);
+        $grade->rawgrade = $calificacion;
+        $envio[$record->autor_id] = $grade;
+    }
+
+    taller_grade_item_update($taller, $envio);
 }

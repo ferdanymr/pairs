@@ -451,5 +451,16 @@ class taller{
         }
     }
 
+    public function mandar_calificacion_gradebook($user){
+        $taller = new stdclass();
+            foreach ($this as $property => $value) {
+                $taller->{$property} = $value;
+            }
+            $taller->course     = $this->course->id;
+            $taller->cmidnumber = $this->cm->id;
+            $taller->modname    = 'taller';
+            taller_update_grades($taller, $user);
+    }
+
     
 }
