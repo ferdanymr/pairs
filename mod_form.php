@@ -81,7 +81,7 @@ class mod_taller_mod_form extends moodleform_mod {
         $mform->addHelpButton('label1', 'estrategia', 'mod_taller');
         
         $categorias = grade_get_categories_menu($this->course->id);
-        $mform->addElement('select', 'categoria', 'Categoria', $categorias);
+        $mform->addElement('select', 'categoria', get_string('categoria','mod_taller'), $categorias);
 
         //listado del 100 al 0
         $opciones = array();

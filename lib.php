@@ -221,7 +221,7 @@ function taller_grade_item_update(stdclass $taller, $envio=null) {
     $item['grademin']  = 0;
     grade_update('mod/taller', $taller->course, 'mod', 'taller', $taller->id, 0, $envio , $item);
 }
-//una ves que envies tu trabajo no podrá ser modificado
+
 /**
  * Update taller grades in the gradebook
  *

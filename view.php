@@ -135,8 +135,8 @@ if($taller->fase == 0){
         echo '	<div class="col-10 offset-1 text-center">';
         echo '      <h3>'. get_string('qevaluate_alum','mod_taller'). '</h3>';
         echo '      <p>'. get_string('adver_evaluar_alumn','mod_taller'). '</p>';
-        echo '      <a class="btn btn-secondary" href="'. $urlCancel.'">'. 'Cancelar' .'</a>';
-        echo '      <a class="btn btn-primary" href="'. $urlConfirm.'">'. 'Confirmar' .'</a>';
+        echo '      <a class="btn btn-secondary" href="'. $urlCancel.'">'. get_string('cancelar','mod_taller') .'</a>';
+        echo '      <a class="btn btn-primary" href="'. $urlConfirm.'">'. get_string('confirmar','mod_taller') .'</a>';
         echo '	</div>';
         echo '</div>';
 
@@ -194,7 +194,7 @@ if($taller->fase == 0){
             echo '</div>';
 
             $url = new moodle_url('/mod/taller/view.php', array('id' => $cm->id, 'confirm_env' => '1'));
-            echo '<a class="btn btn-primary" href="'. $url.'">'. 'Evaluar trabajos' .'</a>';
+            echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('publicar','mod_taller') .'</a>';
             print_collapsible_region_end();
 
         }else{
@@ -240,27 +240,32 @@ if($taller->fase == 0){
             echo '	</div>';
             echo '</div>';
             print_collapsible_region_end();
-
+            
+            $a = new stdclass();
+            $a->noEvaluaciones = $noEvaluaciones;
+            $a->no_revisiones  = $taller->no_revisiones;
+            
             print_collapsible_region_start('','evaluaciones-hechas',get_string('evaluate_done','mod_taller'));
             echo '<div class="row">';
             echo '	<div class="col-12">';
-            echo "      <p>Trabajos evaluados: $noEvaluaciones de $taller->no_revisiones</p>";
+            echo '      <p>' . get_string('evaluados','mod_taller',$a) . '</p>';
             echo '	</div>';
             echo '</div>';
 
-            if($noEvaluaciones != 0){
-                echo '<ul>';
-                $contador = 1;
-                foreach($evaluacionesUser as $edit){
-                    echo '<li>';
-                    $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id,
-                        'trabajo' => $edit->taller_entrega_id, 'edit' => '1'));
-                    echo '  <a href="'. $url.'">Editar evaluación numero '. $contador.'</a>';
-                    echo '</li>';
-                    $contador++;
-                }
-                echo '</ul>';
-            }
+            //Editar evaluaciones
+            //if($noEvaluaciones != 0){
+            //    echo '<ul>';
+            //    $contador = 1;
+            //    foreach($evaluacionesUser as $edit){
+            //        echo '<li>';
+            //        $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id,
+            //            'trabajo' => $edit->taller_entrega_id, 'edit' => '1'));
+            //        echo '  <a href="'. $url.'">Editar evaluación numero '. $contador.'</a>';
+            //        echo '</li>';
+            //        $contador++;
+            //    }
+            //    echo '</ul>';
+            //}
 
             if($noEvaluaciones != $taller->no_revisiones){
 
@@ -281,29 +286,20 @@ if($taller->fase == 0){
             print_collapsible_region_end();
             echo  '<br>';
 
+            $a->no_calificaciones = $envio->no_calificaciones;
+
             print_collapsible_region_start('','calificacion-obtenidas', get_string('calificacion','mod_taller'));
             echo '<div class="row">';
             echo '	<div class="col-12">';
-
-            if($envio->no_calificaciones == $taller->no_revisiones && $noEvaluaciones == $taller->no_revisiones){
-            
-                echo '      <p>'. get_string('calif_final','mod_taller') .'</p>';
-                echo "      <p>$envio->calificacion</p>";
-            
-            }else{
-            
-                echo '      <p>'. get_string('info_calif','mod_taller') .'</p>';
-                echo "      <p>Evaluaciones recibidas $envio->no_calificaciones de $taller->no_revisiones</p>";
-            
-            }
-
+            echo '      <p>'. get_string('info_calif','mod_taller') .'</p>';
+            echo '      <p>' . get_string('recibidas','mod_taller',$a) . '</p>';
             echo '	</div>';
             echo '</div>';
             print_collapsible_region_end();
 
         }
     } else if ($envio->envio_listo == 2) {
-        echo '<h2 class="text-center">Tu calificacion final es</h2>';
+        echo '<h2 class="text-center">' . get_string('califinal','mod_taller') . '</h2>';
         $calificacion = round($envio->calificacion,$taller->no_decimales);
         echo "<h4 class='text-center'>$calificacion</h4>";
     }
