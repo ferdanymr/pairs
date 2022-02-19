@@ -80,6 +80,9 @@ class mod_taller_mod_form extends moodleform_mod {
         $mform->addElement('static', 'label1', get_string('estrategia','mod_taller'), get_string('rub', 'mod_taller'));
         $mform->addHelpButton('label1', 'estrategia', 'mod_taller');
         
+        $categorias = grade_get_categories_menu($this->course->id);
+        $mform->addElement('select', 'categoria', 'Categoria', $categorias);
+
         //listado del 100 al 0
         $opciones = array();
         for($i = 100; $i >= 0; $i--){
@@ -174,5 +177,33 @@ class mod_taller_mod_form extends moodleform_mod {
             $editor = array('text'=>$data['retro_conclusion'], 'format'=>$data['retro_conclusionformat']);
             $data['retro_conclusion'] = $editor;
         }
+    }
+
+    /**
+     * Set the grade item categories when editing an instance
+     */
+    public function definition_after_data() {
+
+        $mform =& $this->_form;
+
+        if ($id = $mform->getElementValue('update')) {
+            $instance   = $mform->getElementValue('instance');
+
+            $gradeitems = grade_item::fetch_all(array(
+                'itemtype'      => 'mod',
+                'itemmodule'    => 'taller',
+                'iteminstance'  => $instance,
+                'courseid'      => $this->course->id));
+            
+            $gradeitem = current($gradeitems);
+            if (!empty($gradeitems)) {
+
+                    $element = $mform->getElement('categoria');
+                    $element->setValue($gradeitem->categoryid);
+
+            }
+        }
+
+        parent::definition_after_data();
     }
 }

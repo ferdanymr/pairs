@@ -75,6 +75,10 @@ function taller_add_instance(stdclass $taller) {
 
     $id = $DB->insert_record('taller', $taller);
 
+    // create gradebook items
+    taller_grade_item_update($taller);
+    taller_grade_item_category_update($taller);
+
     return $id;
 }
 
@@ -84,29 +88,35 @@ function taller_add_instance(stdclass $taller) {
  * Given an object containing all the necessary data (defined in mod_form.php),
  * this function will update an existing instance with new data.
  *
- * @param object $moduleinstance An object from the form in mod_form.php.
+ * @param object $taller An object from the form in mod_form.php.
  * @param mod_taller_mod_form $mform The form.
  * @return bool True if successful, false otherwise.
  */
-function taller_update_instance($moduleinstance, $mform = null) {
+function taller_update_instance(stdclass $taller) {
     global $DB;
-    $editor = $moduleinstance->instruccion_envio;
-    $moduleinstance->timemodified = time();
-    $moduleinstance->id = $moduleinstance->instance;
-    $moduleinstance->instruccion_envioformat             = $editor['format'];
-    $moduleinstance->instruccion_envio       = $editor['text'];
+    $editor = $taller->instruccion_envio;
+    $taller->timemodified = time();
+    $taller->id = $taller->instance;
+    $taller->instruccion_envioformat             = $editor['format'];
+    $taller->instruccion_envio       = $editor['text'];
 
-    $editor = $moduleinstance->instruccion_valoracion;
+    $editor = $taller->instruccion_valoracion;
 
-    $moduleinstance->instruccion_valoracionformat        = $editor['format'];
-    $moduleinstance->instruccion_valoracion  = $editor['text'];
+    $taller->instruccion_valoracionformat        = $editor['format'];
+    $taller->instruccion_valoracion  = $editor['text'];
 
-    $editor = $moduleinstance->retro_conclusion;
+    $editor = $taller->retro_conclusion;
 
-    $moduleinstance->retro_conclusionformat        = $editor['format'];
-    $moduleinstance->retro_conclusion        = $editor['text'];
+    $taller->retro_conclusionformat        = $editor['format'];
+    $taller->retro_conclusion        = $editor['text'];
 
-    return $DB->update_record('taller', $moduleinstance);
+    $DB->update_record('taller', $taller);
+    
+    // create gradebook items
+    taller_grade_item_update($taller);
+    taller_grade_item_category_update($taller);
+
+    return $taller->id;
 }
 
 /**
@@ -207,11 +217,11 @@ function taller_grade_item_update(stdclass $taller, $envio=null) {
     $item = array();
     $item['itemname'] = $a->tallername;
     $item['gradetype'] = GRADE_TYPE_VALUE;
-    $item['grademax']  = 10.00;
+    $item['grademax']  = 100.00;
     $item['grademin']  = 0;
     grade_update('mod/taller', $taller->course, 'mod', 'taller', $taller->id, 0, $envio , $item);
 }
-
+//una ves que envies tu trabajo no podrá ser modificado
 /**
  * Update taller grades in the gradebook
  *
@@ -242,4 +252,20 @@ function taller_update_grades(stdclass $taller, $userid=0) {
     }
 
     taller_grade_item_update($taller, $envio);
+}
+
+function taller_grade_item_category_update($taller) {
+
+    $gradeitems = grade_item::fetch_all(array(
+        'itemtype'      => 'mod',
+        'itemmodule'    => 'taller',
+        'iteminstance'  => $taller->id,
+        'courseid'      => $taller->course));
+    
+    $gradeitem = current($gradeitems);
+    if (!empty($gradeitem)) {
+        if ($gradeitem->categoryid != $taller->categoria) {
+            $gradeitem->set_parent($taller->categoria);
+        }
+    }
 }

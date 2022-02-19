@@ -222,9 +222,6 @@ class taller{
         //calificacion del envio más la calificacion de valoracion
         $calificacion += $this->calif_valoracion;
 
-        //escala sobre 10
-        $calificacion /= 10;
-
         $calificacion = round($calificacion, $this->no_decimales);
 
         $envio->calificacion = $calificacion;
