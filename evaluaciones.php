@@ -148,7 +148,7 @@ if(count($envio) == 0){
 }else{
 
     print_collapsible_region_start('','instrucciones-evaluacion', get_string('instruc_evaluacion','mod_taller'));
-    echo '<div class="row">';
+    echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
     echo '	<div class="col-12">';
     echo "      <p>$taller->instruccion_valoracion</p>";
     echo '	</div>';
@@ -167,7 +167,7 @@ if(count($envio) == 0){
     
 
     print_collapsible_region_start('','archivo',get_string('download_arch','mod_taller'));
-    echo '<div class="row">';
+    echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
     echo '	<div class="col-12">';
     echo '     <p><a class="btn btn-secondary" href="'. $archivoUrl.'">'.$filename.'</a></p>';
     echo '	</div>';

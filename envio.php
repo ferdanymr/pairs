@@ -130,8 +130,8 @@ if($envio->id && !$edit){
     $url = new moodle_url('/mod/taller/envio.php', array('id' => $cm->id, 'env'=>$envio->id, 'edit'=>'1'));
     $urlDelete = new moodle_url('/mod/taller/envio.php', array('id' => $cm->id, 'delete' => $envio->id));
 
-    echo '<a class="btn btn-primary" href="'. $url .'">'.get_string('setenvio','mod_taller').'</a>';
-    echo '<a class="btn btn-primary" href="'. $urlDelete .'">'.get_string('deletenvio','mod_taller').'</a>';
+    echo '<a class="btn btn-outline-primary" href="'. $url .'">'.get_string('setenvio','mod_taller').'</a>';
+    echo '<a class="btn ml-3 btn-outline-secondary" href="'. $urlDelete .'">'.get_string('deletenvio','mod_taller').'</a>';
 
 }else{
     require_once('localview/main_form.php');

@@ -95,6 +95,7 @@ class mod_taller_mod_form extends moodleform_mod {
 
         $mform->addElement('float', 'calif_aprobatoria', get_string('calif_aprob', 'mod_taller'));
         $mform->addHelpButton('calif_aprobatoria', 'calif_aprob', 'mod_taller');
+        $mform->addRule('calif_aprobatoria', 'la calificacion aprobatoria solo es númerica', 'numeric', null, 'client');
 
         $select1 = $mform->addElement('select', 'calif_valoracion', get_string('calif_val', 'mod_taller'), $opciones);
         $select1->setSelected('20');
@@ -102,6 +103,7 @@ class mod_taller_mod_form extends moodleform_mod {
 
         $mform->addElement('float', 'calif_aprob_valoracion', get_string('calif_aprob_val', 'mod_taller'));
         $mform->addHelpButton('calif_aprob_valoracion', 'calif_aprob_val', 'mod_taller');
+        $mform->addRule('calif_aprob_valoracion', 'la calificacion aprobatoria de valoración es solo númerica', 'numeric', null, 'client');
         
         $opciones = array();
         for($i = 5; $i >= 0; $i--){
@@ -116,8 +118,9 @@ class mod_taller_mod_form extends moodleform_mod {
         //editor de instrucciones de envio
         $mform->addElement('editor', 'instruccion_envio', get_string('param_inst', 'mod_taller'));
 
+        //Configuracion para admitir mas de un solo archivo
         $options = array();
-        for ($i = 7; $i >= 1; $i--) {
+        for ($i = 1; $i >= 1; $i--) {
             $options[$i] = $i;
         }
 

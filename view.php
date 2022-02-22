@@ -131,10 +131,10 @@ if($taller->fase == 0){
 
         $urlConfirm = new moodle_url('/mod/taller/view.php', array('id' => $cm->id, 'confirm_env' => '2'));
         $urlCancel = new moodle_url('/mod/taller/view.php', array('id' => $cm->id));
-        echo '<div class="row">';
-        echo '	<div class="col-10 offset-1 text-center">';
-        echo '      <h3>'. get_string('qevaluate_alum','mod_taller'). '</h3>';
-        echo '      <p>'. get_string('adver_evaluar_alumn','mod_taller'). '</p>';
+        echo '<div class="row mb-5">';
+        echo '	<div class="col-8 offset-2 text-center border border-primary shadow p-3 bg-white rounded">';
+        echo '      <h3 class="mt-3 mb-5">'. get_string('qevaluate_alum','mod_taller'). '</h3>';
+        echo '      <p class="mb-4">'. get_string('adver_evaluar_alumn','mod_taller'). '</p>';
         echo '      <a class="btn btn-secondary" href="'. $urlCancel.'">'. get_string('cancelar','mod_taller') .'</a>';
         echo '      <a class="btn btn-primary" href="'. $urlConfirm.'">'. get_string('confirmar','mod_taller') .'</a>';
         echo '	</div>';
@@ -155,7 +155,7 @@ if($taller->fase == 0){
         /////////////////////////////////////////////////////////////////////////////////////////////////
         //si  no configuramos la vista para mostrar los envios
         print_collapsible_region_start('','instrucciones-envio',get_string('param_inst','mod_taller'));
-        echo '<div class="row">';
+        echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
         echo '	<div class="col-12">';
         echo "      <p>$taller->instruccion_envio</p>";
         echo '	</div>';
@@ -173,41 +173,40 @@ if($taller->fase == 0){
             //traemos el ultimo registro
             $file       = end($files);
             //traemos el nombre y un mensaje de que su envio ha sido registrado con exito
-            echo '<div class="row">';
-            echo '	<div class="col-12">';
-            echo '      <br>';
-            echo '      <p>'. $file->get_filename() .' '. get_string('successenvio','mod_taller').'</p>';
-            echo '	</div>';
-            echo '</div>';
             //mostramos un boton para que el usuario pueda ver su envio
             $url = new moodle_url('/mod/taller/envio.php', array('id' => $cm->id, 'env' => $envio->id));
-            echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('verenvio','mod_taller').'</a>';
+            echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
+            echo '	<div class="col-12">';
+            echo '      <p>'. $file->get_filename() .' '. get_string('successenvio','mod_taller').'</p>';
+            echo '      <p><a class="btn btn-outline-secondary btn-sm" href="'. $url.'">'. get_string('verenvio','mod_taller').'</a></p>';
+            echo '	</div>';
+            echo '</div>';
             print_collapsible_region_end();
-            echo '<br>';
-
+            
+            $url = new moodle_url('/mod/taller/view.php', array('id' => $cm->id, 'confirm_env' => '1'));
             print_collapsible_region_start('','calificar', get_string('calif_ot_env','mod_taller'));
-            echo '<div class="row">';
+            echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
             echo '	<div class="col-12">';
             echo '      <br>';
             echo '      <p>'. get_string('info_envio','mod_taller') .'</p>';
+            echo '      <p class="text-center"><a class="btn btn-primary btn-lg" href="'. $url.'">'. get_string('publicar','mod_taller') .'</a></p>';
             echo '	</div>';
             echo '</div>';
-
-            $url = new moodle_url('/mod/taller/view.php', array('id' => $cm->id, 'confirm_env' => '1'));
-            echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('publicar','mod_taller') .'</a>';
             print_collapsible_region_end();
 
         }else{
-
-            //si no tiene envio configuramos la vista para desplegar un mensaje de que aun no tiene ningun envio
-            echo '<div class="row">';
-            echo '	<div class="col-12">';
-            echo '      <p>'.get_string('noenvio','mod_taller').'</p>';
-            echo '	</div>';
-            echo '</div>';
+            
             //mostramos un boton para que pueda añadir su envio
             $url = new moodle_url('/mod/taller/envio.php', array('id' => $cm->id));
-            echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('addenvio','mod_taller').'</a>';
+
+            //si no tiene envio configuramos la vista para desplegar un mensaje de que aun no tiene ningun envio
+            echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
+            echo '	<div class="col-12">';
+            echo '      <p>'.get_string('noenvio','mod_taller').'</p>';
+            echo '      <p><a class="btn btn-outline-primary" href="'. $url.'">'.get_string('addenvio','mod_taller').'</a></p>';
+            echo '	</div>';
+            echo '</div>';
+            
             print_collapsible_region_end();
 
         }
@@ -234,7 +233,7 @@ if($taller->fase == 0){
 
             //si  no configuramos la vista para mostrar las instrucciones de evaluacion
             print_collapsible_region_start('','instrucciones-evaluacion', get_string('instruc_evaluacion','mod_taller'));
-            echo '<div class="row">';
+            echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
             echo '	<div class="col-12">';
             echo "      <p>$taller->instruccion_valoracion</p>";
             echo '	</div>';
@@ -246,9 +245,24 @@ if($taller->fase == 0){
             $a->no_revisiones  = $taller->no_revisiones;
             
             print_collapsible_region_start('','evaluaciones-hechas',get_string('evaluate_done','mod_taller'));
-            echo '<div class="row">';
+            echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
             echo '	<div class="col-12">';
             echo '      <p>' . get_string('evaluados','mod_taller',$a) . '</p>';
+            if($noEvaluaciones != $taller->no_revisiones){
+
+                if($evaluacionPendiente){
+
+                    $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->taller_entrega_id));
+                
+                }else{
+                
+                    $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id));
+                
+                }
+
+                echo '<p><a class="btn btn-outline-primary" href="'. $url.'">'. get_string('evaluarJob','mod_taller') .'</a><p>';
+
+            }
             echo '	</div>';
             echo '</div>';
 
@@ -267,29 +281,12 @@ if($taller->fase == 0){
             //    echo '</ul>';
             //}
 
-            if($noEvaluaciones != $taller->no_revisiones){
-
-                if($evaluacionPendiente){
-
-                    $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $evaluacionPendiente->taller_entrega_id));
-                
-                }else{
-                
-                    $url = new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id));
-                
-                }
-
-                echo '<a class="btn btn-primary" href="'. $url.'">'. get_string('evaluarJob','mod_taller') .'</a>';
-
-            }
-
             print_collapsible_region_end();
-            echo  '<br>';
 
             $a->no_calificaciones = $envio->no_calificaciones;
 
             print_collapsible_region_start('','calificacion-obtenidas', get_string('calificacion','mod_taller'));
-            echo '<div class="row">';
+            echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
             echo '	<div class="col-12">';
             echo '      <p>'. get_string('info_calif','mod_taller') .'</p>';
             echo '      <p>' . get_string('recibidas','mod_taller',$a) . '</p>';
@@ -303,10 +300,14 @@ if($taller->fase == 0){
         $calificacion = round($envio->calificacion,$taller->no_decimales);
         echo "<h4 class='text-center'>$calificacion</h4>";
     }
-
-    echo '<br>';
-    $url = new moodle_url('/mod/taller/aspectos.php', array('cmid' => $cm->id));
-    echo '<a class="btn btn-primary" href="'. $url.'">'.get_string('setcriterios','mod_taller').'</a>';
+    
+    if(!has_capability('mod/taller:criterios', $PAGE->context)){
+        
+        echo '<br>';
+        $url = new moodle_url('/mod/taller/aspectos.php', array('cmid' => $cm->id));
+        echo '<a class="btn btn-outline-secondary btn-sm" href="'. $url.'">'.get_string('setcriterios','mod_taller').'</a>';
+        
+    }
 }
 
 echo $OUTPUT->footer();
