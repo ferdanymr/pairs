@@ -56,7 +56,7 @@ class restore_taller_activity_task extends restore_activity_task {
         $contents[] = new restore_decode_content('taller',
                           array('intro', 'instruccion_envio', 'instruccion_valoracion', 'retro_conclusion'), 'taller');
         $contents[] = new restore_decode_content('criterios_evaluacion',
-                          array('criterio'), 'criterios_evaluacion');
+                          array('criterio'), 'criterio_evaluacion');
 
         return $contents;
     }

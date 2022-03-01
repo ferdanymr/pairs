@@ -301,7 +301,7 @@ if($taller->fase == 0){
         echo "<h4 class='text-center'>$calificacion</h4>";
     }
     
-    if(!has_capability('mod/taller:criterios', $PAGE->context)){
+    if(has_capability('mod/taller:criterios', $PAGE->context)){
         
         echo '<br>';
         $url = new moodle_url('/mod/taller/aspectos.php', array('cmid' => $cm->id));
