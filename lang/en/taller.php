@@ -89,3 +89,5 @@ $string['publicar']              = 'Publicar trabajo';
 $string['evaluados']             = 'Trabajos evaluados: {$a->noEvaluaciones} de {$a->no_revisiones}';
 $string['recibidas']             = 'Evaluaciones recibidas {$a->no_calificaciones} de {$a->no_revisiones}';
 $string['califinal']             = 'Tu calificacion final es';
+$string['resettallerall']        = 'Resetear por defecto los talleres';
+$string['resetenvios']           = 'Borrar las tareas enviadas';

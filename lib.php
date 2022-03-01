@@ -269,3 +269,26 @@ function taller_grade_item_category_update($taller) {
         }
     }
 }
+
+//////////////////////////////////////////
+//Reset curse                           //
+/////////////////////////////////////////
+function taller_reset_course_form_definition($mform) {
+    $mform->addElement('header', 'tallerheader', get_string('modulenameplural', 'mod_taller'));
+
+    $mform->addElement('checkbox', 'reset_taller_all', get_string('resettallerall','mod_taller'));
+
+    $mform->addElement('advcheckbox', 'reset_taller_envios', get_string('resetenvios', 'mod_taller'));
+    $mform->disabledIf('reset_taller_envios', 'reset_taller_all', 'checked');
+}
+
+
+function workshop_reset_course_form_defaults(stdClass $course) {
+
+    $defaults = array(
+        'reset_taller_all'    => 1,
+        'reset_taller_envios' => 1,
+    );
+
+    return $defaults;
+}
