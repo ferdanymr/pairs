@@ -125,6 +125,11 @@ class taller{
         return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND autor_id = $userId;");
     }
 
+    public function get_envios(){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id;");
+    }
+
     public function get_evaluaciones_completas_by_userId($userId){
         global $DB;
         return $DB->get_records_sql("SELECT taller_entrega_id FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1;");
@@ -459,5 +464,42 @@ class taller{
             taller_update_grades($taller, $user);
     }
 
+    public function reset_userdata(stdClass $data){
+        $this->reset_userdata_envios($data);
+    }
+
+    protected function reset_userdata_envios(stdClass $data) {
+        global $DB;
+
+        $envios = $this->get_envios();
+        foreach ($envios as $envio) {
+            $this->delete_evaluacion_user($envio);
+            $this->delete_envio($envio);
+            $DB->delete_records('taller_entrega', array('id' => $envio->id));
+        }
+
+        return true;
+    }
+
+    protected function delete_evaluacion_user($envio){
+        global $DB;
+        $evaluaciones = $this->get_evaluaciones_by_envioId($envio->id);
+        
+        if(!empty($evaluaciones)){
+        
+            foreach ($evaluaciones as $evaluacion) {
+
+                $DB->delete_records('taller_respuesta_rubrica', array('taller_evaluacion_user_id' => $evaluacion->id));
     
+            }
+    
+            $DB->delete_records('taller_evaluacion_user', array('id' => $evaluacion->id));
+
+        }
+    }
+
+    protected function delete_envio($envio){
+        $fs = get_file_storage();
+        $fs->delete_area_files($this->context->id, 'mod_taller', 'submission_attachment', $envio->id);
+    }
 }

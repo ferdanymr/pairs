@@ -278,17 +278,41 @@ function taller_reset_course_form_definition($mform) {
 
     $mform->addElement('checkbox', 'reset_taller_all', get_string('resettallerall','mod_taller'));
 
-    $mform->addElement('advcheckbox', 'reset_taller_envios', get_string('resetenvios', 'mod_taller'));
-    $mform->disabledIf('reset_taller_envios', 'reset_taller_all', 'checked');
 }
 
 
-function workshop_reset_course_form_defaults(stdClass $course) {
+function taller_reset_course_form_defaults(stdClass $course) {
 
     $defaults = array(
         'reset_taller_all'    => 1,
-        'reset_taller_envios' => 1,
     );
 
     return $defaults;
+}
+
+function taller_reset_userdata($data) {
+    global $CFG, $DB;
+    $status[] = array('component' => get_string('modulenameplural', 'mod_taller'), 'item' => get_string('resettaller','mod_taller'),
+        'error' => false);
+    if (!empty($data->reset_taller_all)) {
+        
+        $tallerRecords = $DB->get_records('taller', array('course' => $data->courseid));
+        
+        if(!empty($tallerRecords)){
+            
+            require_once($CFG->dirroot . '/mod/taller/locallib.php');
+            $course = $DB->get_record('course', array('id' => $data->courseid), '*', MUST_EXIST);
+
+            foreach ($tallerRecords as $tallerRecord) {
+                $cm = get_coursemodule_from_instance('taller', $tallerRecord->id, $course->id, false, MUST_EXIST);
+                $taller = new taller($tallerRecord, $cm, $course);
+                $taller->reset_userdata($data);
+            }
+
+            return $status;
+        }
+
+    }
+
+    return $status;
 }
