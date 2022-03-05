@@ -125,6 +125,7 @@ if ($mform->is_cancelled()) {
 }else if ($fromform = $mform->get_data()) {
 
     $taller->edit_opciones_criterio($opcionesSelec, $fromform, $evaluacion, $envio);
+    $taller->asignar_calificacion_by_valoracion($USER->id);
     redirect($taller->url_vista());
 }
 

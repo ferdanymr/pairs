@@ -225,8 +225,8 @@ if($taller->fase == 0){
 
         if($envio->no_calificaciones == $taller->no_revisiones && $noEvaluaciones == $taller->no_revisiones){
             
-            $taller->asignar_calif_final($envio);
-            $taller->mandar_calificacion_gradebook($envio->autor_id);
+            $taller->taller_completado_by_user($envio);
+            
             redirect($taller->url_vista());
 
         }else{
@@ -296,9 +296,23 @@ if($taller->fase == 0){
 
         }
     } else if ($envio->envio_listo == 2) {
-        echo '<h2 class="text-center">' . get_string('califinal','mod_taller') . '</h2>';
+        echo '<div class="row">';
+        echo '	<div class="col-12">';
+        echo '      <h2 class="text-center">' . get_string('califinal','mod_taller') . '</h2>';
         $calificacion = round($envio->calificacion,$taller->no_decimales);
-        echo "<h4 class='text-center'>$calificacion</h4>";
+        echo "      <h4 class='text-center'>$calificacion</h4>";
+        echo '	</div>';
+        echo '</div>';
+
+        if(strlen($taller->retro_conclusion) != 0){
+            echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 mt-5 bg-white rounded">';
+            echo '	<div class="col-12">';
+            echo '      <h3 class="text-center">' . get_string('retro_con','mod_taller') . '</h3>';
+            echo "      <p class='text-center'>$taller->retro_conclusion</p>";
+            echo '	</div>';
+            echo '</div>';
+        }
+
     }
     
     if(has_capability('mod/taller:criterios', $PAGE->context)){

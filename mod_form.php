@@ -124,8 +124,9 @@ class mod_taller_mod_form extends moodleform_mod {
             $options[$i] = $i;
         }
 
-        $select2 = $mform->addElement('select', 'no_archivos', get_string('param_max', 'mod_taller'), $options);
-        $select2->setSelected('1');
+        $mform->addElement('hidden', 'no_archivos','1');
+        //$select2 = $mform->addElement('select', 'no_archivos', get_string('param_max', 'mod_taller'), $options);
+        //$select2->setSelected('1');
 
         $mform->addElement('filetypes', 'tipo_arch', get_string('param_type_arch', 'mod_taller'));
         $mform->addHelpButton('tipo_arch', 'param_type_arch', 'mod_taller');

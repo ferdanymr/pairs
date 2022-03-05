@@ -204,36 +204,63 @@ class taller{
         $DB->update_record('taller', $this->dbrecord, $bulk=false);
     }
 
-    public function asignar_calif_final($envio){
+    public function asignar_calificacion_by_valoracion($userId){
+        $envio = $this->get_envio_by_userId($userId);
+        $envio = current($envio);
+        $this->asignar_calificacion($envio);
+    }
+
+    public function asignar_calificacion($envio){
         global $DB;
         //las evaluaciones que ha recibido el trabajo junto con su calificacion
         $evaluaciones = $this->get_evaluaciones_by_envioId($envio->id);
         $calificacion = 0;
+        if(!empty($evaluaciones)){
         
-        foreach ($evaluaciones as $evaluacion) {
+            foreach ($evaluaciones as $evaluacion) {
+
+                $calificacion += $evaluacion->calificacion;
+
+            }
+
+            //la sumatoria de las evaluaciones sobre el numero de revisiones
+            $calificacion = $calificacion /  $this->no_revisiones;
+
+            $calificacion = $calificacion * $this->calif_envio; 
+
+            //calificacion total del envio
+            $calificacion = $calificacion / $this->puntos_max_rubrica;
+        }
+        
+        //calificacion del envio más la calificacion de valoracion
+        $valoraciones = $this->get_evaluaciones_completas_by_userId($envio->autor_id);
+        $valoraciones = count($valoraciones);
+
+        if($valoraciones > 0){
             
-            $calificacion += $evaluacion->calificacion;
+            $valorUnaEvaluacion = $this->calif_valoracion / $this->no_revisiones;
+            
+            $calificacionValoracion = $valoraciones * $valorUnaEvaluacion;
+
+            $calificacion += $calificacionValoracion;
 
         }
 
-        //la sumatoria de las evaluaciones sobre el numero de revisiones
-        $calificacion = $calificacion /  $this->no_revisiones;
-        
-        $calificacion = $calificacion * $this->calif_envio; 
-
-        //calificacion total del envio
-        $calificacion = $calificacion / $this->puntos_max_rubrica;
-        
-        //calificacion del envio más la calificacion de valoracion
-        $calificacion += $this->calif_valoracion;
-
         $calificacion = round($calificacion, $this->no_decimales);
-
+        
         $envio->calificacion = $calificacion;
 
-        $envio->envio_listo = 2;
-
         $DB->update_record('taller_entrega', $envio);
+
+        $this->mandar_calificacion_gradebook($envio->autor_id);
+    }
+
+    public function taller_completado_by_user($envio){
+        global $DB;
+
+        $envio->envio_listo = 2;
+        $DB->update_record('taller_entrega', $envio);
+
     }
 
     public function edit_opciones_criterio($opciones, $dataform, $evaluacion, $envio){
@@ -277,7 +304,8 @@ class taller{
 
         $evaluacion->calificacion = $calificacion;
         $this->update_evaluacion($evaluacion);
-
+        
+        $this->asignar_calificacion($envio);
     }
 
     public function edit_envio($data){
