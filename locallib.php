@@ -122,22 +122,33 @@ class taller{
 
     public function get_envio_by_userId($userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND autor_id = $userId;");
+        return $DB->get_records_sql("SELECT * FROM {taller_entrega} 
+                                        WHERE taller_id = $this->id 
+                                        AND autor_id = $userId;");
     }
 
     public function get_envios(){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id;");
+        return $DB->get_records_sql("SELECT * FROM {taller_entrega} 
+                                        WHERE taller_id = $this->id;");
     }
 
     public function get_evaluaciones_completas_by_userId($userId){
         global $DB;
-        return $DB->get_records_sql("SELECT taller_entrega_id FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1;");
+        return $DB->get_records_sql("SELECT taller_entrega_id 
+                                        FROM {taller_evaluacion_user} 
+                                        WHERE taller_id = $this->id 
+                                        AND evaluador_id = $userId 
+                                        AND is_evaluado = 1;");
     }
 
     public function get_evaluacion_completa_by_entregaId($entregaId, $userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 1 AND taller_entrega_id = $entregaId;");
+        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
+                                        WHERE taller_id = $this->id 
+                                        AND evaluador_id = $userId 
+                                        AND is_evaluado = 1 
+                                        AND taller_entrega_id = $entregaId;");
     }
 
     public function get_evaluacion_by_id($id){
@@ -147,31 +158,70 @@ class taller{
 
     public function get_evaluacion_pendiente_by_userId($userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND evaluador_id = $userId AND is_evaluado = 0;");
+        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
+                                        WHERE taller_id = $this->id 
+                                        AND evaluador_id = $userId 
+                                        AND is_evaluado = 0;");
     }
 
     public function get_respuestas_evaluacion($evaluacionId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_respuesta_rubrica} WHERE taller_evaluacion_user_id = $evaluacionId ORDER BY id ASC;");
+        return $DB->get_records_sql("SELECT * FROM {taller_respuesta_rubrica} 
+                                        WHERE taller_evaluacion_user_id = $evaluacionId 
+                                        ORDER BY id 
+                                        ASC;");
     }
-    public function get_envio_para_evaluar($userId, $evaluacionesCompletas){
+    
+    public function get_envio_para_evaluar($userId, $evaluacionesCompletas, $groupid){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND envio_listo = 1 AND autor_id != $userId AND id NOT IN ($evaluacionesCompletas) ORDER BY no_calificaciones DESC LIMIT 1;");
+        if($groupid){
+
+            $sql = "SELECT entrega.id, entrega.titulo, entrega.comentario,
+                        entrega.envios, entrega.envio_listo, entrega.calificacion,
+                        entrega.no_calificaciones, entrega.taller_id, entrega.autor_id
+                        FROM {taller_entrega} AS entrega
+                        JOIN {groups_members} AS members
+                        ON members.userid = entrega.autor_id
+                        WHERE members.groupid = $groupid
+                        AND entrega.taller_id = $this->id 
+                        AND entrega.envio_listo = 1 
+                        AND entrega.autor_id != $userId 
+                        AND entrega.id NOT IN ($evaluacionesCompletas) 
+                        ORDER BY entrega.no_calificaciones 
+                        DESC LIMIT 1;";
+
+        }else{
+
+            $sql = "SELECT * FROM {taller_entrega} 
+                        WHERE taller_id = $this->id 
+                        AND envio_listo = 1 
+                        AND autor_id != $userId 
+                        AND id NOT IN ($evaluacionesCompletas) 
+                        ORDER BY no_calificaciones 
+                        DESC LIMIT 1;";
+
+        }
+
+        return $DB->get_records_sql($sql);
     }
 
     public function get_envio_by_id($id){
         global $DB;
-        return $DB->get_record_sql("SELECT * FROM {taller_entrega} WHERE taller_id = $this->id AND id = $id;");
+        return $DB->get_record_sql("SELECT * FROM {taller_entrega} 
+                                        WHERE taller_id = $this->id 
+                                        AND id = $id;");
     }
 
     public function get_criterios(){
         global $DB;
-        return  $DB->get_records_sql("SELECT * FROM {taller_criterio} WHERE taller_id = $this->id;");
+        return  $DB->get_records_sql("SELECT * FROM {taller_criterio} 
+                                        WHERE taller_id = $this->id;");
     }
 
     public function get_opciones_criterio($criterioId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} WHERE taller_criterio_id = $criterioId;");
+        return $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} 
+                                        WHERE taller_criterio_id = $criterioId;");
     }
 
     public function update_evaluacion($evaluacion){
@@ -186,7 +236,36 @@ class taller{
 
     public function get_evaluaciones_by_envioId($envioId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE taller_id = $this->id AND taller_entrega_id = $envioId;");
+        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
+                                        WHERE taller_id = $this->id 
+                                        AND taller_entrega_id = $envioId;");
+    }
+
+    public function get_resourse_for_report($groupid){
+        global $DB;
+        if($groupid){
+            
+            $sql = "SELECT user.firstname, user.lastname, 
+                        entrega.id AS entregaid, entrega.titulo,
+                        entrega.calificacion, entrega.no_calificaciones,
+                        entrega.autor_id AS autor
+                        FROM {groups_members} AS members 
+                        JOIN {user} AS user ON members.userid = user.id
+                        LEFT JOIN {taller_entrega} AS entrega ON user.id = entrega.autor_id AND entrega.taller_id = $this->id
+                        WHERE members.groupid = $groupid;";
+
+        }else{
+
+            $sql = "SELECT user.firstname, user.lastname,
+                        entrega.id AS entregaid, entrega.titulo,
+                        entrega.calificacion, entrega.no_calificaciones,
+                        entrega.autor_id AS autor
+                        FROM {taller_entrega} AS entrega 
+                        JOIN {user} AS user ON user.id = entrega.autor_id
+                        WHERE entrega.taller_id = $this->id";
+
+        }
+        return $DB->get_records_sql($sql);
     }
 
     public function set_puntos_totales_rubrica(){
@@ -195,7 +274,11 @@ class taller{
         $puntos = 0;
         
         foreach($criterios as $criterio){
-            $p = $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} WHERE taller_criterio_id = $criterio->id ORDER BY calificacion DESC LIMIT 1;");
+            $p = $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} 
+                                        WHERE taller_criterio_id = $criterio->id 
+                                        ORDER BY calificacion 
+                                        DESC 
+                                        LIMIT 1;");
             $p = current($p);
             $puntos +=  $p->calificacion;
         }
@@ -266,6 +349,7 @@ class taller{
     public function edit_opciones_criterio($opciones, $dataform, $evaluacion, $envio){
         global $DB;
         $calificacion = 0;
+        var_dump($dataform);
         if($opciones){
             $contador = 0;
             foreach ($dataform as $opcion) {
@@ -273,7 +357,7 @@ class taller{
                 $opcion = explode("-", $opcion);
                 $calificacion += $opcion[1];
 
-                if($opcion[0] !== "Guardar cambios"){
+                if(strlen($opcion[0]) < 4){
                     $data->id                        = $opciones[$contador]->id;
                     $data->taller_opcion_cri_id      = $opcion[0];
                     $data->taller_evaluacion_user_id = $evaluacion->id;
@@ -289,7 +373,7 @@ class taller{
                 $opcion = explode("-", $opcion);
                 $calificacion += $opcion[1];
                 
-                if($opcion[0] !== "Guardar cambios"){
+                if(strlen($opcion[0]) < 4){
                     $data->taller_opcion_cri_id      = $opcion[0];
                     $data->taller_evaluacion_user_id = $evaluacion->id;
                     $DB->insert_record('taller_respuesta_rubrica', $data);
@@ -430,7 +514,6 @@ class taller{
                 $criterio->criterio           = $descripcion['text'];
                 $criterio->criterioformat     = $descripcion['format'];
                 $criterio->taller_id = $this->id;
-                var_dump($criterio);
                 $idCriterio                   = $DB->insert_record('taller_criterio', $criterio);
 
                 $this->add_opciones_criterio($fromform, $idCriterio, $i);

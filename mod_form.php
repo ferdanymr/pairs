@@ -154,10 +154,18 @@ class mod_taller_mod_form extends moodleform_mod {
         
         $mform->addElement('editor', 'retro_conclusion', get_string('retro_con', 'mod_taller'));
         
-        // Add standard elements.
+        $coursecontext = context_course::instance($this->course->id);
+
+        // To be removed (deprecated) with MDL-67526.
+        plagiarism_get_form_elements_module($mform, $coursecontext, 'mod_taller');
+
+        // Common module settings, Restrict availability, Activity completion etc. ----
+        $features = array('groups' => true, 'groupings' => true,
+                'outcomes' => true, 'gradecat' => false, 'idnumber' => true);
+
         $this->standard_coursemodule_elements();
 
-        // Add standard buttons.
+        // Standard buttons, common to all modules ------------------------------------
         $this->add_action_buttons();
     }
 

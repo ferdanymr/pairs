@@ -92,3 +92,4 @@ $string['califinal']             = 'Tu calificacion final es';
 $string['resettallerall']        = 'Reiniciar los talleres a valores por defecto';
 $string['resetenvios']           = 'Borrar las tareas enviadas';
 $string['resettaller']           = 'Reiniciar talleres';
+$string['fintaller']             = 'Finalizar taller';

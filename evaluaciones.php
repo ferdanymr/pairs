@@ -81,7 +81,21 @@ if($idTrabajo){
 
         }
 
-        $envio = $taller->get_envio_para_evaluar($USER->id, $ids_separados_comas);
+        $groupmode = groups_get_activity_groupmode($taller->cm);
+        //0 si no hay grupos; 1 si hay grupos separados
+        if($groupmode){
+            
+            $groupid = groups_get_activity_group($taller->cm, true);
+
+            $envio = $taller->get_envio_para_evaluar($USER->id, $ids_separados_comas, $groupid);
+
+        }else{
+
+            $envio = $taller->get_envio_para_evaluar($USER->id, $ids_separados_comas, $groupmode);
+
+        }
+
+        
         
         if(count($envio) != 0){
             $envio                          = current($envio);

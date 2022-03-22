@@ -123,7 +123,18 @@ if($taller->fase == 0){
     
     $mform->display();
 
-}else{
+}else if($taller->fase == 1){
+    if(has_capability('mod/taller:criterios', $PAGE->context)){
+        $url = new moodle_url('/mod/taller/aspectos.php', array('cmid' => $cm->id));
+        echo '<div class="row mb-5 text-center">';
+        echo '	<div class="col-6">';
+        echo '      <a class="btn btn-outline-info btn-sm" href="'. $url.'">'.get_string('setcriterios','mod_taller').'</a>';
+        echo '	</div>';
+        echo '	<div class="col-6">';
+        echo '      <a class="btn btn-outline-info btn-sm" href="'. $url.'">'.get_string('fintaller','mod_taller').'</a>';
+        echo '	</div>';
+        echo '</div>';
+    }
     /////////////////////////////////////////////////////////////////////////////////////////////////
     //pantalla de confirmacion para pasar a la fase de evaluacion                                  //
     /////////////////////////////////////////////////////////////////////////////////////////////////
@@ -315,12 +326,87 @@ if($taller->fase == 0){
 
     }
     
-    if(has_capability('mod/taller:criterios', $PAGE->context)){
-        
-        echo '<br>';
-        $url = new moodle_url('/mod/taller/aspectos.php', array('cmid' => $cm->id));
-        echo '<a class="btn btn-outline-secondary btn-sm" href="'. $url.'">'.get_string('setcriterios','mod_taller').'</a>';
-        
+    if(!has_capability('mod/taller:criterios', $PAGE->context)){
+        $groupmode = groups_get_activity_groupmode($taller->cm);
+        //0 si no hay grupos; 1 si hay grupos separados
+        if($groupmode){
+            
+            $groupid = groups_get_activity_group($taller->cm, true);
+            var_dump($groupid);
+            $currentgroupid = groups_get_group_name($groupid);
+            var_dump($currentgroupid);
+            $resource = $taller->get_resourse_for_report($groupid);
+            var_dump($resource);
+
+        }else{
+
+            $resource = $taller->get_resourse_for_report($groupmode);
+
+        }
+
+        print_collapsible_region_start('','reporte-alumnos', 'Reporte');
+            echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 mt-5 bg-white rounded">';
+            echo '	<div class="col-12">';
+            echo '<table class="table">';
+            echo '  <thead>';
+            echo '    <tr>';
+            echo '      <th scope="col">Alumno</th>';
+            echo '      <th scope="col">Tarea</th>';
+            echo '      <th scope="col">Puntos recibidos</th>';
+            echo '      <th scope="col">Evaluaciones hechas</th>';
+            echo '      <th scope="col">Calificacion</th>';
+            echo '    </tr>';
+            echo '  </thead>';
+            echo '  <tbody>';
+            foreach($resource as $alumno){
+                
+                echo '    <tr>';
+                echo "      <th scope='row'>$alumno->firstname $alumno->lastname</th>";
+
+                if($alumno->titulo){
+                
+                    echo "      <td>$alumno->titulo</td>";
+                
+                    if($alumno->calificacion > 0){
+                        
+                        if($alumno->no_calificaciones){
+                            $calificaciones_recibidas = $taller->get_evaluaciones_by_envioId($alumno->entregaid);
+                            echo "      <td>";
+                            foreach($calificaciones_recibidas as $calificacion){
+                                echo "<p>$calificacion->calificacion</p>";
+                            }
+                            echo "      </td>";
+
+                        }else{
+                            echo '      <td>Sin puntos</td>';
+                        }
+                        
+                        $evaluacionesHechas = $taller->get_evaluaciones_completas_by_userId($alumno->autor);
+                        var_dump($evaluacionesHechas, '<br>');
+                        $evaluacionesHechas = count($evaluacionesHechas);
+                        echo "      <td>$evaluacionesHechas</td>";
+                        echo "      <td>$alumno->calificacion</td>";
+                
+                    }else{
+                
+                        echo '      <td>Sin puntos</td>';
+                        echo '      <td>Sin puntos</td>';
+                        echo '      <td>Sin calificacion</td>';
+                
+                    }
+                
+                }else{
+                    echo '      <td>Sin entrega</td>';
+                    echo '      <td>Sin puntos</td>';
+                    echo '      <td>Sin puntos</td>';
+                    echo '      <td>Sin calificacion</td>';
+                }
+                echo '    </tr>';
+            }
+            echo ' </tbody>';
+            echo '</table>';
+            echo '	</div>';
+            echo '</div>';
     }
 }
 
