@@ -25,6 +25,7 @@
 require(__DIR__.'/../../config.php');
 require_once('locallib.php');
 require_once('localview/aspectos_form.php');
+require_once('localview/groups_form.php');
 
 // Id del curso
 $id = optional_param('id', 0, PARAM_INT);
@@ -39,6 +40,10 @@ $e  = optional_param('e', 0, PARAM_INT);
 $noAspectos = optional_param('no', 0, PARAM_INT);
 
 $confirm_env = optional_param('confirm_env', 0, PARAM_INT);
+
+$grupo = optional_param('grupo', 0, PARAM_INT);
+
+$noAlumnos = optional_param('noAlumnos', 0, PARAM_INT);
 
 if ($id) {
     $cm             = get_coursemodule_from_id('taller', $id, 0, false, MUST_EXIST);
@@ -112,6 +117,7 @@ $PAGE->set_url($taller->url_vista());
 $PAGE->set_title(get_string('pluginname', 'mod_taller'));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($taller->context);
+$PAGE->requires->css(new moodle_url($CFG->wwwroot . '/mod/taller/styles.css'));
 
 echo $OUTPUT->header();
 echo $OUTPUT->heading(format_string($course->name));
@@ -325,22 +331,71 @@ if($taller->fase == 0){
         }
 
     }
-    
-    if(!has_capability('mod/taller:criterios', $PAGE->context)){
+
+    if(has_capability('mod/taller:criterios', $PAGE->context)){
+        //nos trae en que modalidad de grupo estamos
         $groupmode = groups_get_activity_groupmode($taller->cm);
+
         //0 si no hay grupos; 1 si hay grupos separados
         if($groupmode){
             
-            $groupid = groups_get_activity_group($taller->cm, true);
-            var_dump($groupid);
-            $currentgroupid = groups_get_group_name($groupid);
-            var_dump($currentgroupid);
-            $resource = $taller->get_resourse_for_report($groupid);
-            var_dump($resource);
+            //verificamos quien esta entrando a ver el reporte si un profesor o un admin
+            if(has_capability('mod/taller:viewReporAdmin', $PAGE->context)){
+                //Si es admin obtenemos todos los grupos del curso
+                $g = groups_get_all_groups($course->id, 0, 0, $fields='g.*');
+                
+                $groupform = new groups_form(new moodle_url('/mod/taller/view.php', array('id' => $cm->id)), array('groups' => $g, 'grupoSeleccionado' => $grupo));
+
+            }else{
+                
+                $g = groups_get_user_groups($course->id, $USER->id);
+                $g2 = current($g);
+                $g = array();
+                foreach($g2 as $grup){
+                    $objeto = new stdClass();
+                    $objeto->id = $grup;
+                    $objeto->name = groups_get_group_name($grup);
+                    array_push($g, $objeto);
+                }
+
+                if(count($g) == 0){
+                    return false;
+                }
+
+                $groupform = new groups_form(new moodle_url('/mod/taller/view.php', array('id' => $cm->id)), array('groups' => $g, 'grupoSeleccionado' => $grupo));
+
+            }
+
+            //si no se ha seleccionado ningun grupo se le mostrara el ultimo grupo
+            if($grupo){
+                $resource = $taller->get_resourse_for_report($grupo);
+            }else{
+                $grupo = end($g);
+                $resource = $taller->get_resourse_for_report($grupo->id);
+            }
+
+            if ($groupform->is_cancelled()) {
+            
+            }else if ($fromform = $groupform->get_data()) {
+
+                redirect(new moodle_url('/mod/taller/view.php', array('id' => $cm->id, 'grupo' => $fromform->groups, 'noAlumnos' => $fromform->alumn)));
+            
+            }
+            
+            print_collapsible_region_start('','grupo', 'Grupos');
+                echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 mt-5 bg-white rounded">';
+                echo '	<div class="col-12">';
+                    $groupform->display();
+                echo '  </div>';
+                echo '</div>';
+            print_collapsible_region_end();
+            
+            
 
         }else{
 
-            $resource = $taller->get_resourse_for_report($groupmode);
+            $resource = $taller->get_resourse_for_report($groupmode, $taller->context->id);
+            var_dump($modulecontext->id);
 
         }
 
@@ -353,8 +408,8 @@ if($taller->fase == 0){
             echo '      <th scope="col">Alumno</th>';
             echo '      <th scope="col">Tarea</th>';
             echo '      <th scope="col">Puntos recibidos</th>';
-            echo '      <th scope="col">Evaluaciones hechas</th>';
-            echo '      <th scope="col">Calificacion</th>';
+            echo '      <th scope="col">Puntos otorgados</th>';
+            echo '      <th scope="col">Calificación</th>';
             echo '    </tr>';
             echo '  </thead>';
             echo '  <tbody>';
@@ -372,19 +427,45 @@ if($taller->fase == 0){
                         if($alumno->no_calificaciones){
                             $calificaciones_recibidas = $taller->get_evaluaciones_by_envioId($alumno->entregaid);
                             echo "      <td>";
+
                             foreach($calificaciones_recibidas as $calificacion){
-                                echo "<p>$calificacion->calificacion</p>";
+                                
+                                $url = new moodle_url('/mod/taller/reporte.php', array('id' => $cm->id, 'puntosRecibidos' => 1, 'evaluacion' => $calificacion->id,
+                                    'evaluador' => $calificacion->evaluador_id, 'alumno' => $alumno->idalumno, 'trabajo' => $alumno->entregaid));
+                                echo '      <p><a class="btn btn-outline-primary btn-lg" href="' . $url . '">' .$calificacion->calificacion . '</a></p>';
+                            
                             }
+
                             echo "      </td>";
 
                         }else{
+
                             echo '      <td>Sin puntos</td>';
+
                         }
                         
-                        $evaluacionesHechas = $taller->get_evaluaciones_completas_by_userId($alumno->autor);
-                        var_dump($evaluacionesHechas, '<br>');
-                        $evaluacionesHechas = count($evaluacionesHechas);
-                        echo "      <td>$evaluacionesHechas</td>";
+                        $evaluacionesHechas = $taller->get_evaluaciones_completas_by_report($alumno->autor);
+                        $noEvaluacionesHechas = count($evaluacionesHechas);
+                        if($noEvaluacionesHechas){
+
+                            echo "      <td>";
+                            
+                            foreach($evaluacionesHechas as $calificacion){
+                                $envio = $taller->get_envio_by_id($calificacion->taller_entrega_id);
+                                
+                                $url = new moodle_url('/mod/taller/reporte.php', array('id' => $cm->id, 'puntosDados' => 1,'evaluacion' => $calificacion->id,
+                                    'evaluador'=>$calificacion->evaluador_id, 'alumno' => $envio->autor_id, 'trabajo'=>$calificacion->taller_entrega_id));
+
+                                echo '      <p><a class="btn btn-outline-primary btn-lg" href="' . $url . '">' .$calificacion->calificacion . '</a></p>';
+                            
+                            }
+
+                            echo "      </td>";
+
+                        }else{
+                            echo "      <td>$noEvaluacionesHechas</td>";
+                        }
+                        
                         echo "      <td>$alumno->calificacion</td>";
                 
                     }else{
@@ -399,7 +480,7 @@ if($taller->fase == 0){
                     echo '      <td>Sin entrega</td>';
                     echo '      <td>Sin puntos</td>';
                     echo '      <td>Sin puntos</td>';
-                    echo '      <td>Sin calificacion</td>';
+                    echo '      <td>Sin calificación</td>';
                 }
                 echo '    </tr>';
             }

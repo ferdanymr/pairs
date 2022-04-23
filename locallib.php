@@ -120,6 +120,13 @@ class taller{
         return new moodle_url('/mod/taller/view.php', array('id' => $this->cm->id));
     }
 
+    public function get_info_user($userId){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {user} 
+                                        WHERE id = $userId;");
+
+    }
+
     public function get_envio_by_userId($userId){
         global $DB;
         return $DB->get_records_sql("SELECT * FROM {taller_entrega} 
@@ -142,6 +149,14 @@ class taller{
                                         AND is_evaluado = 1;");
     }
 
+    public function get_evaluaciones_completas_by_report($userId){
+        global $DB;
+        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
+                                        WHERE taller_id = $this->id 
+                                        AND evaluador_id = $userId 
+                                        AND is_evaluado = 1;");
+    }
+    
     public function get_evaluacion_completa_by_entregaId($entregaId, $userId){
         global $DB;
         return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
@@ -241,11 +256,11 @@ class taller{
                                         AND taller_entrega_id = $envioId;");
     }
 
-    public function get_resourse_for_report($groupid){
+    public function get_resourse_for_report($groupid, $contextid=0){
         global $DB;
         if($groupid){
             
-            $sql = "SELECT user.firstname, user.lastname, 
+            $sql = "SELECT user.id AS idalumno, user.firstname, user.lastname, 
                         entrega.id AS entregaid, entrega.titulo,
                         entrega.calificacion, entrega.no_calificaciones,
                         entrega.autor_id AS autor
@@ -255,14 +270,10 @@ class taller{
                         WHERE members.groupid = $groupid;";
 
         }else{
-
-            $sql = "SELECT user.firstname, user.lastname,
-                        entrega.id AS entregaid, entrega.titulo,
-                        entrega.calificacion, entrega.no_calificaciones,
-                        entrega.autor_id AS autor
-                        FROM {taller_entrega} AS entrega 
-                        JOIN {user} AS user ON user.id = entrega.autor_id
-                        WHERE entrega.taller_id = $this->id";
+            var_dump($contextid);
+            $sql = "SELECT * FROM {role_assignments} as assig
+                        JOIN {user} AS u on assig.userid = u.id
+                        WHERE assig.contextid = $contextid";
 
         }
         return $DB->get_records_sql($sql);
