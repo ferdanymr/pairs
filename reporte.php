@@ -40,6 +40,8 @@ $puntosRecibidos  = optional_param('puntosRecibidos', 0, PARAM_INT);
 
 $evaluador  = optional_param('evaluador', 0, PARAM_INT);
 
+$profesor  = optional_param('profesor', 0, PARAM_INT);
+
 $alumno  = optional_param('alumno', 0, PARAM_INT);
 
 $trabajo  = optional_param('trabajo', 0, PARAM_INT);
@@ -94,11 +96,35 @@ echo '<p class="mb-5">
     </p>';
 echo "<h5 class='mb-5'>Evaluador: $evaluador->firstname $evaluador->lastname</h5>";
 
+if($profesor){
+
+    $profesor = $taller->get_info_user($profesor);
+    $profesor = current($profesor);
+
+    echo "<h5 class='mb-5'>Modificado por: $profesor->firstname $profesor->lastname</h5>";
+}
+
 $opcionesSelec = $taller->get_respuestas_evaluacion($evaluacion);
 $opcionesSelec = array_values($opcionesSelec);
 
-$mform = new rubrica_form(new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $idTrabajo, 'edit' => '1')), 
+$evaluacion = $taller->get_evaluacion_by_id($evaluacion);
+$evaluacion = current($evaluacion);
+$evaluacion->edit_user_id = $USER->id;
+
+$envio = $taller->get_envio_by_id($trabajo);
+$mform = new rubrica_form(new moodle_url('/mod/taller/reporte.php', array('id' => $cm->id, 'trabajo' => $trabajo, 'evaluacion' => $evaluacion->id)), 
     array('criterios' => $taller->get_criterios(), 'taller'=> $taller, 'opcionesSelec' => $opcionesSelec));
+
+if ($mform->is_cancelled()) {
+
+    redirect($taller->url_vista());    
+
+}else if ($fromform = $mform->get_data()) {    
+
+    $taller->edit_opciones_criterio($opcionesSelec, $fromform, $evaluacion, $envio);
+    
+    redirect($taller->url_vista());
+}
 
 $mform->display();
 

@@ -256,7 +256,7 @@ class taller{
                                         AND taller_entrega_id = $envioId;");
     }
 
-    public function get_resourse_for_report($groupid, $contextid=0){
+    public function get_resourse_for_report($groupid = 0, $contextid=0){
         global $DB;
         if($groupid){
             
@@ -270,10 +270,15 @@ class taller{
                         WHERE members.groupid = $groupid;";
 
         }else{
-            var_dump($contextid);
-            $sql = "SELECT * FROM {role_assignments} as assig
-                        JOIN {user} AS u on assig.userid = u.id
-                        WHERE assig.contextid = $contextid";
+            $sql = "SELECT user.id AS idalumno, user.firstname, user.lastname, 
+            entrega.id AS entregaid, entrega.titulo,
+            entrega.calificacion, entrega.no_calificaciones,
+            entrega.autor_id AS autor
+            FROM mdl_user AS user
+            INNER JOIN {groups_members} AS members ON members.userid = user.id 
+            INNER JOIN {role_assignments} AS role_assig ON role_assig.userid = user.id 
+            INNER JOIN mdl_role ON mdl_role.id = role_assig.roleid
+            LEFT JOIN {taller_entrega} AS entrega ON user.id = entrega.autor_id AND entrega.taller_id = $this->id;";
 
         }
         return $DB->get_records_sql($sql);
@@ -317,8 +322,8 @@ class taller{
 
             }
 
-            //la sumatoria de las evaluaciones sobre el numero de revisiones
-            $calificacion = $calificacion /  $this->no_revisiones;
+            //la sumatoria de las evaluaciones sobre el numero de evaluaciones
+            $calificacion = $calificacion /  count($evaluaciones);
 
             $calificacion = $calificacion * $this->calif_envio; 
 
@@ -346,7 +351,13 @@ class taller{
 
         $DB->update_record('taller_entrega', $envio);
 
-        $this->mandar_calificacion_gradebook($envio->autor_id);
+        //$this->mandar_calificacion_gradebook($envio->autor_id);
+    }
+
+    public function fin_taller(){
+
+        $this->mandar_calificacion_gradebook();
+        
     }
 
     public function taller_completado_by_user($envio){
@@ -360,7 +371,6 @@ class taller{
     public function edit_opciones_criterio($opciones, $dataform, $evaluacion, $envio){
         global $DB;
         $calificacion = 0;
-        var_dump($dataform);
         if($opciones){
             $contador = 0;
             foreach ($dataform as $opcion) {
@@ -575,7 +585,7 @@ class taller{
         }
     }
 
-    public function mandar_calificacion_gradebook($user){
+    public function mandar_calificacion_gradebook($user=0){
         $taller = new stdclass();
             foreach ($this as $property => $value) {
                 $taller->{$property} = $value;
@@ -592,6 +602,9 @@ class taller{
 
     protected function reset_userdata_envios(stdClass $data) {
         global $DB;
+        
+        $DB->set_field('taller', 'fase', '0', array('id' => $this->id));
+        $this->fase = '0';
 
         $envios = $this->get_envios();
         foreach ($envios as $envio) {
