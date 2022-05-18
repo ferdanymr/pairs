@@ -17,7 +17,7 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,12 +30,12 @@ require_once($CFG->libdir . '/filelib.php');
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-class mod_taller_mod_form extends moodleform_mod {
+class mod_pairs_mod_form extends moodleform_mod {
 
     protected $course = null;
 
@@ -59,7 +59,7 @@ class mod_taller_mod_form extends moodleform_mod {
         $mform->addElement('header', 'general', get_string('general', 'form'));
 
         // Adding the standard "name" field.
-        $mform->addElement('text', 'name', get_string('tallername', 'mod_taller'), array('size' => '64'));
+        $mform->addElement('text', 'name', get_string('pairsname', 'mod_pairs'), array('size' => '64'));
 
         if (!empty($CFG->formatstringstriptags)) {
             $mform->setType('name', PARAM_TEXT);
@@ -74,14 +74,14 @@ class mod_taller_mod_form extends moodleform_mod {
         $this->standard_intro_elements('Descripcion');
         
         //añadimos cabecera de Ajustes Calificación
-        $mform->addElement('header', 'ajustescalif', get_string('ajustescalif', 'mod_taller'));
+        $mform->addElement('header', 'ajustescalif', get_string('ajustescalif', 'mod_pairs'));
         
         //Añadimos etiqueta de estatedia y etiqueta de rubrica
-        $mform->addElement('static', 'label1', get_string('estrategia','mod_taller'), get_string('rub', 'mod_taller'));
-        $mform->addHelpButton('label1', 'estrategia', 'mod_taller');
+        $mform->addElement('static', 'label1', get_string('estrategia','mod_pairs'), get_string('rub', 'mod_pairs'));
+        $mform->addHelpButton('label1', 'estrategia', 'mod_pairs');
         
         $categorias = grade_get_categories_menu($this->course->id);
-        $mform->addElement('select', 'categoria', get_string('categoria','mod_taller'), $categorias);
+        $mform->addElement('select', 'categoria', get_string('categoria','mod_pairs'), $categorias);
 
         //listado del 100 al 0
         $opciones = array();
@@ -89,34 +89,34 @@ class mod_taller_mod_form extends moodleform_mod {
             $opciones[$i] = $i;
         }
 
-        $select = $mform->addElement('select', 'calif_envio', get_string('calif_env', 'mod_taller'), $opciones);
+        $select = $mform->addElement('select', 'attachment', get_string('calif_env', 'mod_pairs'), $opciones);
         $select->setSelected('80');
-        $mform->addHelpButton('calif_envio', 'calif_env', 'mod_taller');
+        $mform->addHelpButton('attachment', 'calif_env', 'mod_pairs');
 
-        $mform->addElement('float', 'calif_aprobatoria', get_string('calif_aprob', 'mod_taller'));
-        $mform->addHelpButton('calif_aprobatoria', 'calif_aprob', 'mod_taller');
-        $mform->addRule('calif_aprobatoria', 'la calificacion aprobatoria solo es númerica', 'numeric', null, 'client');
+        $mform->addElement('float', 'calif_aprobatoria', get_string('calif_aprob', 'mod_pairs'));
+        $mform->addHelpButton('calif_aprobatoria', 'calif_aprob', 'mod_pairs');
+        $mform->addRule('calif_aprobatoria', 'la rating aprobatoria solo es númerica', 'numeric', null, 'client');
 
-        $select1 = $mform->addElement('select', 'calif_valoracion', get_string('calif_val', 'mod_taller'), $opciones);
+        $select1 = $mform->addElement('select', 'assessment', get_string('calif_val', 'mod_pairs'), $opciones);
         $select1->setSelected('20');
-        $mform->addHelpButton('calif_valoracion', 'calif_val', 'mod_taller');
+        $mform->addHelpButton('assessment', 'calif_val', 'mod_pairs');
 
-        $mform->addElement('float', 'calif_aprob_valoracion', get_string('calif_aprob_val', 'mod_taller'));
-        $mform->addHelpButton('calif_aprob_valoracion', 'calif_aprob_val', 'mod_taller');
-        $mform->addRule('calif_aprob_valoracion', 'la calificacion aprobatoria de valoración es solo númerica', 'numeric', null, 'client');
+        $mform->addElement('float', 'calif_aprob_valoracion', get_string('calif_aprob_val', 'mod_pairs'));
+        $mform->addHelpButton('calif_aprob_valoracion', 'calif_aprob_val', 'mod_pairs');
+        $mform->addRule('calif_aprob_valoracion', 'la rating aprobatoria de valoración es solo númerica', 'numeric', null, 'client');
         
         $opciones = array();
         for($i = 5; $i >= 0; $i--){
             $opciones[$i] = $i;
         }
 
-        $select2 = $mform->addElement('select', 'no_decimales', get_string('no_decimales', 'mod_taller'), $opciones);
+        $select2 = $mform->addElement('select', 'no_decimals', get_string('no_decimals', 'mod_pairs'), $opciones);
         $select2->setSelected('0');
         
         //parametros de envio ---------------------
-        $mform->addElement('header', 'param_env', get_string('param_env', 'mod_taller'));
+        $mform->addElement('header', 'param_env', get_string('param_env', 'mod_pairs'));
         //editor de instrucciones de envio
-        $mform->addElement('editor', 'instruccion_envio', get_string('param_inst', 'mod_taller'));
+        $mform->addElement('editor', 'instruction_attachment', get_string('param_inst', 'mod_pairs'));
 
         //Configuracion para admitir mas de un solo archivo
         $options = array();
@@ -124,20 +124,20 @@ class mod_taller_mod_form extends moodleform_mod {
             $options[$i] = $i;
         }
 
-        $mform->addElement('hidden', 'no_archivos','1');
-        //$select2 = $mform->addElement('select', 'no_archivos', get_string('param_max', 'mod_taller'), $options);
+        $mform->addElement('hidden', 'no_attachments','1');
+        //$select2 = $mform->addElement('select', 'no_attachments', get_string('param_max', 'mod_pairs'), $options);
         //$select2->setSelected('1');
 
-        $mform->addElement('filetypes', 'tipo_arch', get_string('param_type_arch', 'mod_taller'));
-        $mform->addHelpButton('tipo_arch', 'param_type_arch', 'mod_taller');
+        $mform->addElement('filetypes', 'type_attachments', get_string('param_type_arch', 'mod_pairs'));
+        $mform->addHelpButton('type_attachments', 'param_type_arch', 'mod_pairs');
 
         $options = get_max_upload_sizes($CFG->maxbytes, $this->course->maxbytes);
-        $mform->addElement('select', 'tam_max', get_string('param_tam_max', 'mod_taller'), $options);
+        $mform->addElement('select', 'max_size', get_string('param_max_size', 'mod_pairs'), $options);
         
         //Configuración de la valoración---------------------------------------
-        $mform->addElement('header', 'conf_val', get_string('conf_val', 'mod_taller'));
+        $mform->addElement('header', 'conf_val', get_string('conf_val', 'mod_pairs'));
         
-        $mform->addElement('editor', 'instruccion_valoracion', get_string('conf_val_inst', 'mod_taller'));
+        $mform->addElement('editor', 'instruction_assessment', get_string('conf_val_inst', 'mod_pairs'));
 
 
         $options = array();
@@ -145,19 +145,19 @@ class mod_taller_mod_form extends moodleform_mod {
             $options[$i] = $i;
         }
 
-        $select2 = $mform->addElement('select', 'no_revisiones', get_string('no_revisiones', 'mod_taller'), $options);
+        $select2 = $mform->addElement('select', 'no_revisions', get_string('no_revisions', 'mod_pairs'), $options);
         $select2->setSelected('3');
-        $mform->addHelpButton('no_revisiones', 'no_revisiones', 'mod_taller');
+        $mform->addHelpButton('no_revisions', 'no_revisions', 'mod_pairs');
 
         //Retroalimentación---------------------------------------
-        $mform->addElement('header', 'retro', get_string('retro', 'mod_taller'));
+        $mform->addElement('header', 'retro', get_string('retro', 'mod_pairs'));
         
-        $mform->addElement('editor', 'retro_conclusion', get_string('retro_con', 'mod_taller'));
+        $mform->addElement('editor', 'retro_conclusion', get_string('retro_con', 'mod_pairs'));
         
         $coursecontext = context_course::instance($this->course->id);
 
         // To be removed (deprecated) with MDL-67526.
-        plagiarism_get_form_elements_module($mform, $coursecontext, 'mod_taller');
+        plagiarism_get_form_elements_module($mform, $coursecontext, 'mod_pairs');
 
         // Common module settings, Restrict availability, Activity completion etc. ----
         $features = array('groups' => true, 'groupings' => true,
@@ -180,11 +180,11 @@ class mod_taller_mod_form extends moodleform_mod {
      */
     public function data_preprocessing(&$data) {
         if ($this->current->instance) {
-            $editor = array('text'=>$data['instruccion_envio'], 'format'=>$data['instruccion_envioformat']);
-            $data['instruccion_envio'] = $editor;
+            $editor = array('text'=>$data['instruction_attachment'], 'format'=>$data['instruction_attachmentformat']);
+            $data['instruction_attachment'] = $editor;
             
-            $editor = array('text'=>$data['instruccion_valoracion'], 'format'=>$data['instruccion_valoracionformat']);
-            $data['instruccion_valoracion'] = $editor;
+            $editor = array('text'=>$data['instruction_assessment'], 'format'=>$data['instruction_assessmentformat']);
+            $data['instruction_assessment'] = $editor;
 
             $editor = array('text'=>$data['retro_conclusion'], 'format'=>$data['retro_conclusionformat']);
             $data['retro_conclusion'] = $editor;
@@ -203,7 +203,7 @@ class mod_taller_mod_form extends moodleform_mod {
 
             $gradeitems = grade_item::fetch_all(array(
                 'itemtype'      => 'mod',
-                'itemmodule'    => 'taller',
+                'itemmodule'    => 'pairs',
                 'iteminstance'  => $instance,
                 'courseid'      => $this->course->id));
             

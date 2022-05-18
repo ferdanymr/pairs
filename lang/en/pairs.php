@@ -17,7 +17,7 @@
 /**
  * Plugin strings are defined here.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @category    string
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,10 +25,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['modulename']            = 'Evaluacion pares';
-$string['pluginname']            = 'Evaluacion pares';
-$string['modulenameplural']      = 'Evaluaciones pares';
-$string['tallername']            = 'Nombre del taller';
+$string['modulename']            = 'Pairs';
+$string['pluginname']            = 'Pairs';
+$string['modulenameplural']      = 'Pairs';
+$string['pairsname']             = 'Nombre del pairs';
 $string['ajustescalif']          = 'Ajustes de calificación';
 $string['categoria']             = 'Categoria';
 $string['estrategia']            = 'Estrategia de calificación';
@@ -42,36 +42,36 @@ $string['calif_val']             = 'Calificación por valoración';
 $string['calif_val_help']        = 'Esta configuración determina la calificación maxima que puede obtenerse en la valoración de un trabajo enviado.';
 $string['calif_aprob_val']       = 'Calificación aprobatoria de valoración';
 $string['calif_aprob_val_help']  = 'Esta configuración determina la calificación mínima requerida para pasar.';
-$string['no_decimales']          = 'Posiciones decimales en las calificaciones';
+$string['no_decimals']           = 'Posiciones decimales en las calificaciones';
 $string['param_env']             = 'Parámetros de los envíos';
 $string['param_inst']            = 'Instrucciones para el envío';
 $string['param_max']             = 'Número máximo de archivos adjuntos por envío';
 $string['param_type_arch']       = 'Tipos de archivos permitidos como anexos a envíos';
 $string['param_type_arch_help']  = 'Los tipos de archivos permitidos para el envio pueden restringirse al proporcionar una lista de los tipos de archivos permitidos. Si el campo se deja vacío, entonces todos de arvhivos estan permitidos.';
-$string['param_tam_max']         = 'Tamaño máximo del anexo del envío';
+$string['param_max_size']        = 'Tamaño máximo del anexo del envío';
 $string['conf_val']              = 'Configuración de la valoración';
 $string['conf_val_inst']         = 'Instrucciones para la valoración';
 $string['retro']                 = 'Retroalimentación';
 $string['retro_con']             = 'Conclusión';
-$string['no_revisiones']         = 'Numero de revisiones';
-$string['no_revisiones_help']    = 'Este parametro indica el numero de revisiones que tiene que recibir un alumno una ves que envie su trabajo.';
+$string['no_revisions']          = 'Numero de revisiones';
+$string['no_revisions_help']     = 'Este parametro indica el numero de revisiones que tiene que recibir un alumno una ves que envie su trabajo.';
 $string['criterio']              = 'Criterio';
 $string['descrip']               = 'Descripción';
 $string['calif_def']             = 'Calificación de nivel y definición';
 $string['envio']                 = 'Envío';
-$string['titulo']                = 'Título';
+$string['title']                 = 'Título';
 $string['contenidoenvio']        = 'Contenido del envío';
 $string['num_max_arch']          = 'Número máximo de archivos adjuntos por envío:';
 $string['adjunto']               = 'Adjunto';
-$string['coment']                = 'Comentario';
+$string['coment']                = 'comment';
 $string['noenvio']               = 'No se ha registrado ningun archivo.';
 $string['addenvio']              = 'Añadir envio';
 $string['setenvio']              = 'Editar envio';
 $string['setcriterios']          = 'Modificar criterios';
-$string['successenvio']          = 'ha sido registado con exito';
+$string['successenvio']          = 'ha sido registado con éxito.';
 $string['verenvio']              = 'Ver envio';
 $string['deletenvio']            = 'Eliminar envio';
-$string['qevaluate_alum']       = '¿Estas seguro de publicar tu trabajo?';
+$string['qevaluate_alum']        = '¿Estas seguro de publicar tu trabajo?';
 $string['adver_evaluar_alumn']   = 'Una vez que publiques tu trabajo no podrá ser modificado.';
 $string['info_envio']            = 'Una vez realizado el envio, puedes publicar tu trabajo para que tus compañeros puedan evaluarlo y a su vez tu puedes evaluar los suyos.';
 $string['info_calif']            = 'Cuando obtenga y realice el numero de evaluaciones que se requiere se le mostrara su calificacion.';
@@ -80,16 +80,28 @@ $string['calif_final']           = 'Su calificacion final es:';
 $string['calif_ot_env']          = 'Publicar trabajo';
 $string['instruc_evaluacion']    = 'Instrucciones evaluacion';
 $string['evaluate_done']         = 'Evaluaciones realizadas';
-$string['calificacion']          = 'Calificación';
+$string['rating']                = 'Calificación';
 $string['no_env']                = 'De momento no hay envios para evaluar vuelve un poco más tarde.';
 $string['download_arch']         = 'Descarga aquí el archivo a evaluar.';
+$string['alumn']                 = 'Alumno';
+$string['alumn_p']               = 'Alumno: {$a->firstname} {$a->lastname}';
+$string['work']                  = 'Trabajo:';
+$string['evaluador']             = 'Evaluador: {$a->firstname} {$a->lastname}';
+$string['profesor']              = 'Modificado por: {$a->firstname} {$a->lastname}';
+$string['homework']              = 'Tarea';
+$string['points_r']              = 'Puntos recibidos';
+$string['points_o']              = 'Puntos otorgados';
+$string['no_points']             = 'Sin puntos';
+$string['no_rating']             = 'Sin calificación';
+$string['no_delivery']           = 'Sin entrega';
 $string['cancelar']              = 'Cancelar';
 $string['confirmar']             = 'Confirmar';
+$string['dispo_pron']            = 'Disponible pronto.';
 $string['publicar']              = 'Publicar trabajo';
-$string['evaluados']             = 'Trabajos evaluados: {$a->noEvaluaciones} de {$a->no_revisiones}';
-$string['recibidas']             = 'Evaluaciones recibidas {$a->no_calificaciones} de {$a->no_revisiones}';
-$string['califinal']             = 'Tu calificacion final es:';
-$string['resettallerall']        = 'Reiniciar los talleres a valores por defecto';
-$string['resetenvios']           = 'Borrar las tareas enviadas';
-$string['resettaller']           = 'Reiniciar talleres';
-$string['fintaller']             = 'Finalizar taller';
+$string['evaluados']             = 'Trabajos evaluados: {$a->noEvaluaciones} de {$a->no_revisions}';
+$string['recibidas']             = 'Evaluaciones recibidas {$a->no_ratings} de {$a->no_revisions}';
+$string['califinal']             = 'Tu calificación final es:';
+$string['resetpairsall']         = 'Reiniciar los pairs a valores por defecto';
+$string['resetattachments']      = 'Borrar las tareas enviadas';
+$string['resetpairs']            = 'Reiniciar pairs';
+$string['finpairs']              = 'Finalizar pairs';

@@ -15,9 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Capability definitions for the taller module
+ * Capability definitions for the pairs module
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -26,7 +26,7 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-    'mod/taller:criterios' => array(
+    'mod/pairs:criterios' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(
@@ -36,7 +36,7 @@ $capabilities = array(
         )
     ),
 
-    'mod/taller:viewReporAdmin' => array(
+    'mod/pairs:viewReporAdmin' => array(
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => array(

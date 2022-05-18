@@ -17,7 +17,7 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -30,7 +30,7 @@ defined('MOODLE_INTERNAL') || die();
  * @param string $feature Constant representing the feature.
  * @return true | null True if the feature is supported, null otherwise.
  */
-function taller_supports($feature) {
+function pairs_supports($feature) {
     switch ($feature) {
         case FEATURE_GRADE_HAS_GRADE:
             return true;
@@ -54,122 +54,122 @@ function taller_supports($feature) {
 }
 
 /**
- * Saves a new instance of the mod_taller into the database.
+ * Saves a new instance of the mod_pairs into the database.
  *
  * Given an object containing all the necessary data, (defined by the form
  * in mod_form.php) this function will create a new instance and return the id
  * number of the instance.
  *
  * @param object $moduleinstance An object from the form.
- * @param mod_taller_mod_form $mform The form.
+ * @param mod_pairs_mod_form $mform The form.
  * @return int The id of the newly inserted record.
  */
-function taller_add_instance(stdclass $taller) {
+function pairs_add_instance(stdclass $pairs) {
     global $DB;
-    $editor                               = $taller->instruccion_envio;
-    $taller->fase                         = '0';
-    $taller->timecreated                  = time();
-    $taller->timemodified                 = $taller->timecreated;
-    $taller->instruccion_envioformat      = $editor['format'];
-    $taller->instruccion_envio            = $editor['text'];
+    $editor                               = $pairs->instruction_attachment;
+    $pairs->fase                         = '0';
+    $pairs->timecreated                  = time();
+    $pairs->timemodified                 = $pairs->timecreated;
+    $pairs->instruction_attachmentformat      = $editor['format'];
+    $pairs->instruction_attachment            = $editor['text'];
 
-    $editor                               = $taller->instruccion_valoracion;
+    $editor                               = $pairs->instruction_assessment;
 
-    $taller->instruccion_valoracionformat = $editor['format'];
-    $taller->instruccion_valoracion       = $editor['text'];
+    $pairs->instruction_assessmentformat = $editor['format'];
+    $pairs->instruction_assessment       = $editor['text'];
 
-    $editor                               = $taller->retro_conclusion;
+    $editor                               = $pairs->retro_conclusion;
 
-    $taller->retro_conclusionformat       = $editor['format'];
-    $taller->retro_conclusion             = $editor['text'];
+    $pairs->retro_conclusionformat       = $editor['format'];
+    $pairs->retro_conclusion             = $editor['text'];
 
-    $id = $DB->insert_record('taller', $taller);
+    $id = $DB->insert_record('pairs', $pairs);
 
     // create gradebook items
-    taller_grade_item_update($taller);
-    taller_grade_item_category_update($taller);
+    pairs_grade_item_update($pairs);
+    pairs_grade_item_category_update($pairs);
 
     return $id;
 }
 
 /**
- * Updates an instance of the mod_taller in the database.
+ * Updates an instance of the mod_pairs in the database.
  *
  * Given an object containing all the necessary data (defined in mod_form.php),
  * this function will update an existing instance with new data.
  *
- * @param object $taller An object from the form in mod_form.php.
- * @param mod_taller_mod_form $mform The form.
+ * @param object $pairs An object from the form in mod_form.php.
+ * @param mod_pairs_mod_form $mform The form.
  * @return bool True if successful, false otherwise.
  */
-function taller_update_instance(stdclass $taller) {
+function pairs_update_instance(stdclass $pairs) {
     global $DB;
-    $editor = $taller->instruccion_envio;
-    $taller->timemodified = time();
-    $taller->id = $taller->instance;
-    $taller->instruccion_envioformat             = $editor['format'];
-    $taller->instruccion_envio       = $editor['text'];
+    $editor = $pairs->instruction_attachment;
+    $pairs->timemodified = time();
+    $pairs->id = $pairs->instance;
+    $pairs->instruction_attachmentformat             = $editor['format'];
+    $pairs->instruction_attachment       = $editor['text'];
 
-    $editor = $taller->instruccion_valoracion;
+    $editor = $pairs->instruction_assessment;
 
-    $taller->instruccion_valoracionformat        = $editor['format'];
-    $taller->instruccion_valoracion  = $editor['text'];
+    $pairs->instruction_assessmentformat        = $editor['format'];
+    $pairs->instruction_assessment  = $editor['text'];
 
-    $editor = $taller->retro_conclusion;
+    $editor = $pairs->retro_conclusion;
 
-    $taller->retro_conclusionformat        = $editor['format'];
-    $taller->retro_conclusion        = $editor['text'];
+    $pairs->retro_conclusionformat        = $editor['format'];
+    $pairs->retro_conclusion        = $editor['text'];
 
-    $DB->update_record('taller', $taller);
+    $DB->update_record('pairs', $pairs);
     
     // create gradebook items
-    taller_grade_item_update($taller);
-    taller_grade_item_category_update($taller);
+    pairs_grade_item_update($pairs);
+    pairs_grade_item_category_update($pairs);
 
-    return $taller->id;
+    return $pairs->id;
 }
 
 /**
- * Removes an instance of the mod_taller from the database.
+ * Removes an instance of the mod_pairs from the database.
  *
  * @param int $id Id of the module instance.
  * @return bool True if successful, false on failure.
  */
-function taller_delete_instance($id) {
+function pairs_delete_instance($id) {
     global $DB;
 
-    $exists = $DB->get_record('taller', array('id' => $id));
+    $exists = $DB->get_record('pairs', array('id' => $id));
     if (!$exists) {
         return false;
     }
 
-    $DB->delete_records('taller', array('id' => $id));
+    $DB->delete_records('pairs', array('id' => $id));
 
     return true;
 }
 
 /**
- * Serves the files from the taller file areas
+ * Serves the files from the pairs file areas
  *
- * Apart from module intro (handled by pluginfile.php automatically), taller files may be
+ * Apart from module intro (handled by pluginfile.php automatically), pairs files may be
  * media inserted into submission content (like images) and submission attachments. For these two,
  * the fileareas submission_content and submission_attachment are used.
  * Besides that, areas instructauthors, instructreviewers and conclusion contain the media
  * embedded using the mod_form.php.
  *
- * @package  mod_taller
+ * @package  mod_pairs
  * @category files
  *
  * @param stdClass $course the course object
  * @param stdClass $cm the course module object
- * @param stdClass $context the taller's context
+ * @param stdClass $context the pairs's context
  * @param string $filearea the name of the file area
  * @param array $args extra arguments (itemid, path)
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
  * @return bool false if the file not found, just send the file otherwise and do not return anything
  */
-function taller_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
+function pairs_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
     global $DB, $CFG, $USER;
 
     if ($context->contextlevel != CONTEXT_MODULE) {
@@ -180,16 +180,16 @@ function taller_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 
     if ($filearea === 'submission_attachment') {
         $itemid = (int)array_shift($args);
-        if (!$taller = $DB->get_record('taller', array('id' => $cm->instance))) {
+        if (!$pairs = $DB->get_record('pairs', array('id' => $cm->instance))) {
             return false;
         }
-        if (!$submission = $DB->get_record('taller_entrega', array('id' => $itemid, 'taller_id' => $taller->id))) {
+        if (!$submission = $DB->get_record('pairs_delivery', array('id' => $itemid, 'pairs_id' => $pairs->id))) {
             return false;
         }
 
         $fs = get_file_storage();
         $relativepath = implode('/', $args);
-        $fullpath = "/$context->id/mod_taller/$filearea/$itemid/$relativepath";
+        $fullpath = "/$context->id/mod_pairs/$filearea/$itemid/$relativepath";
         if (!$file = $fs->get_file_by_hash(sha1($fullpath)) or $file->is_directory()) {
             return false;
         }
@@ -207,75 +207,75 @@ function taller_pluginfile($course, $cm, $context, $filearea, array $args, $forc
 ////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Creates or updates grade items for the give taller instance
+ * Creates or updates grade items for the give pairs instance
  *
  * Needed by grade_update_mod_grades() in lib/gradelib.php. Also used by
- * {@link taller_update_grades()}.
+ * {@link pairs_update_grades()}.
  *
- * @param stdClass $taller instance object with extra cmidnumber property
+ * @param stdClass $pairs instance object with extra cmidnumber property
  * @param stdClass $envio data for the first grade item
  * @param stdClass $assessmentgrades data for the second grade item
  * @return void
  */
-function taller_grade_item_update(stdclass $taller, $envio=null) {
+function pairs_grade_item_update(stdclass $pairs, $envio=null) {
     global $CFG;
     require_once($CFG->libdir.'/gradelib.php');
 
     $a = new stdclass();
-    $a->tallername = clean_param($taller->name, PARAM_NOTAGS);
+    $a->pairsname = clean_param($pairs->name, PARAM_NOTAGS);
 
     $item = array();
-    $item['itemname'] = $a->tallername;
+    $item['itemname'] = $a->pairsname;
     $item['gradetype'] = GRADE_TYPE_VALUE;
     $item['grademax']  = 100.00;
     $item['grademin']  = 0;
-    grade_update('mod/taller', $taller->course, 'mod', 'taller', $taller->id, 0, $envio , $item);
+    grade_update('mod/pairs', $pairs->course, 'mod', 'pairs', $pairs->id, 0, $envio , $item);
 }
 
 /**
- * Update taller grades in the gradebook
+ * Update pairs grades in the gradebook
  *
  * Needed by grade_update_mod_grades() in lib/gradelib.php
  *
  * @category grade
- * @param stdClass $taller instance object with extra cmidnumber and modname property
+ * @param stdClass $pairs instance object with extra cmidnumber and modname property
  * @param int $userid        update grade of specific user only, 0 means all participants
  * @return void
  */
-function taller_update_grades(stdclass $taller, $userid=0) {
+function pairs_update_grades(stdclass $pairs, $userid=0) {
     global $CFG, $DB;
     require_once($CFG->libdir.'/gradelib.php');
 
     $whereuser = $userid ? ' AND autor_id = :userid' : '';
-    $params = array('taller_id' => $taller->id, 'userid' => $userid);
-    $sql = 'SELECT autor_id, calificacion
-              FROM {taller_entrega}
-             WHERE taller_id = :taller_id' . $whereuser;
+    $params = array('pairs_id' => $pairs->id, 'userid' => $userid);
+    $sql = 'SELECT autor_id, rating
+              FROM {pairs_delivery}
+             WHERE pairs_id = :pairs_id' . $whereuser;
     $records = $DB->get_records_sql($sql, $params);
     $envio = array();
     foreach ($records as $record) {
         $grade = new stdclass();
         $grade->userid = $record->autor_id;
-        $calificacion = round($record->calificacion,$taller->no_decimales);
-        $grade->rawgrade = $calificacion;
+        $rating = round($record->rating,$pairs->no_decimals);
+        $grade->rawgrade = $rating;
         $envio[$record->autor_id] = $grade;
     }
 
-    taller_grade_item_update($taller, $envio);
+    pairs_grade_item_update($pairs, $envio);
 }
 
-function taller_grade_item_category_update($taller) {
+function pairs_grade_item_category_update($pairs) {
 
     $gradeitems = grade_item::fetch_all(array(
         'itemtype'      => 'mod',
-        'itemmodule'    => 'taller',
-        'iteminstance'  => $taller->id,
-        'courseid'      => $taller->course));
+        'itemmodule'    => 'pairs',
+        'iteminstance'  => $pairs->id,
+        'courseid'      => $pairs->course));
     
     $gradeitem = current($gradeitems);
     if (!empty($gradeitem)) {
-        if ($gradeitem->categoryid != $taller->categoria) {
-            $gradeitem->set_parent($taller->categoria);
+        if ($gradeitem->categoryid != $pairs->categoria) {
+            $gradeitem->set_parent($pairs->categoria);
         }
     }
 }
@@ -283,40 +283,40 @@ function taller_grade_item_category_update($taller) {
 //////////////////////////////////////////
 //Reset curse                           //
 /////////////////////////////////////////
-function taller_reset_course_form_definition($mform) {
-    $mform->addElement('header', 'tallerheader', get_string('modulenameplural', 'mod_taller'));
+function pairs_reset_course_form_definition($mform) {
+    $mform->addElement('header', 'pairsheader', get_string('modulenameplural', 'mod_pairs'));
 
-    $mform->addElement('checkbox', 'reset_taller_all', get_string('resettallerall','mod_taller'));
+    $mform->addElement('checkbox', 'reset_pairs_all', get_string('resetpairsall','mod_pairs'));
 
 }
 
 
-function taller_reset_course_form_defaults(stdClass $course) {
+function pairs_reset_course_form_defaults(stdClass $course) {
 
     $defaults = array(
-        'reset_taller_all'    => 1,
+        'reset_pairs_all'    => 1,
     );
 
     return $defaults;
 }
 
-function taller_reset_userdata($data) {
+function pairs_reset_userdata($data) {
     global $CFG, $DB;
-    $status[] = array('component' => get_string('modulenameplural', 'mod_taller'), 'item' => get_string('resettaller','mod_taller'),
+    $status[] = array('component' => get_string('modulenameplural', 'mod_pairs'), 'item' => get_string('resetpairs','mod_pairs'),
         'error' => false);
-    if (!empty($data->reset_taller_all)) {
+    if (!empty($data->reset_pairs_all)) {
         
-        $tallerRecords = $DB->get_records('taller', array('course' => $data->courseid));
+        $pairsRecords = $DB->get_records('pairs', array('course' => $data->courseid));
         
-        if(!empty($tallerRecords)){
+        if(!empty($pairsRecords)){
             
-            require_once($CFG->dirroot . '/mod/taller/locallib.php');
+            require_once($CFG->dirroot . '/mod/pairs/locallib.php');
             $course = $DB->get_record('course', array('id' => $data->courseid), '*', MUST_EXIST);
 
-            foreach ($tallerRecords as $tallerRecord) {
-                $cm = get_coursemodule_from_instance('taller', $tallerRecord->id, $course->id, false, MUST_EXIST);
-                $taller = new taller($tallerRecord, $cm, $course);
-                $taller->reset_userdata($data);
+            foreach ($pairsRecords as $pairsRecord) {
+                $cm = get_coursemodule_from_instance('pairs', $pairsRecord->id, $course->id, false, MUST_EXIST);
+                $pairs = new pairs($pairsRecord, $cm, $course);
+                $pairs->reset_userdata($data);
             }
 
             return $status;

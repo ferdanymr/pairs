@@ -16,12 +16,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * taller backup settings
+ * pairs backup settings
  *
  * Workshop has no particular settings but the inherited from the generic
  * {@link backup_activity_task}.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @category    backup
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later

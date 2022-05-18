@@ -16,7 +16,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -29,31 +29,31 @@
  * Structure step to restore one workshop activity
  */
 
- class restore_taller_activity_structure_step extends restore_activity_structure_step {
+ class restore_pairs_activity_structure_step extends restore_activity_structure_step {
 
 protected function define_structure() {
 
     $paths = array();
     $userinfo = $this->get_setting_value('userinfo');
 
-    $paths[]  = new restore_path_element('taller', '/activity/taller');
+    $paths[]  = new restore_path_element('pairs', '/activity/pairs');
 
-    $paths[] = new restore_path_element('criterio_evaluacion', '/activity/taller/criterios_evaluacion/criterio_evaluacion');
-    $paths[] = new restore_path_element('opcion_criterio', '/activity/taller/criterios_evaluacion/criterio_evaluacion/opciones_criterio/opcion_criterio');
+    $paths[] = new restore_path_element('criterio_evaluacion', '/activity/pairs/criterios_evaluacion/criterio_evaluacion');
+    $paths[] = new restore_path_element('opcion_criterio', '/activity/pairs/criterios_evaluacion/criterio_evaluacion/opciones_criterio/opcion_criterio');
 
     // End here if no-user data has been selected
     if (!$userinfo) {
         return $this->prepare_activity_structure($paths);
     }
 
-    $paths[] = new restore_path_element('entrega', '/activity/taller/entregas/entrega');
-    $paths[] = new restore_path_element('evaluacion', '/activity/taller/entregas/entrega/evaluaciones/evaluacion');
-    $paths[] = new restore_path_element('respuestaEvaluacion', '/activity/taller/entregas/entrega/evaluaciones/evaluacion/respuestasEvaluaciones/respuestaEvaluacion');
+    $paths[] = new restore_path_element('delivery', '/activity/pairs/deliverys/delivery');
+    $paths[] = new restore_path_element('evaluacion', '/activity/pairs/deliverys/delivery/evaluaciones/evaluacion');
+    $paths[] = new restore_path_element('respuestaEvaluacion', '/activity/pairs/deliverys/delivery/evaluaciones/evaluacion/respuestasEvaluaciones/respuestaEvaluacion');
     // Return the paths wrapped into standard activity structure
     return $this->prepare_activity_structure($paths);
 }
 
-protected function process_taller($data) {
+protected function process_pairs($data) {
     global $DB;
 
     $data = (object)$data;
@@ -63,7 +63,7 @@ protected function process_taller($data) {
 
 
     // insert the choice record
-    $newitemid = $DB->insert_record('taller', $data);
+    $newitemid = $DB->insert_record('pairs', $data);
     // immediately after inserting "activity" record, call this
     $this->apply_activity_instance($newitemid);
 }
@@ -74,9 +74,9 @@ protected function process_criterio_evaluacion($data) {
     $data = (object)$data;
     $oldid = $data->id;
 
-    $data->taller_id = $this->get_new_parentid('taller');
+    $data->pairs_id = $this->get_new_parentid('pairs');
     
-    $newitemid = $DB->insert_record('taller_criterio', $data);
+    $newitemid = $DB->insert_record('pairs_criterio', $data);
     $this->set_mapping('criterio_evaluacion', $oldid, $newitemid);
 }
 
@@ -86,23 +86,23 @@ protected function process_opcion_criterio($data) {
     $data = (object)$data;
     $oldid = $data->id;
 
-    $data->taller_criterio_id = $this->get_new_parentid('criterio_evaluacion');
+    $data->pairs_criterio_id = $this->get_new_parentid('criterio_evaluacion');
 
-    $newitemid = $DB->insert_record('taller_opcion_cri', $data);
+    $newitemid = $DB->insert_record('pairs_opcion_cri', $data);
     $this->set_mapping('opcion_criterio', $oldid, $newitemid);
 }
 
-protected function process_entrega($data) {
+protected function process_delivery($data) {
     global $DB;
 
     $data = (object)$data;
     $oldid = $data->id;
 
-    $data->taller_id = $this->get_new_parentid('taller');
+    $data->pairs_id = $this->get_new_parentid('pairs');
     $data->autor_id = $this->get_mappingid('user', $data->autor_id);
 
-    $newitemid = $DB->insert_record('taller_entrega', $data);
-    $this->set_mapping('entrega', $oldid, $newitemid, true);
+    $newitemid = $DB->insert_record('pairs_delivery', $data);
+    $this->set_mapping('delivery', $oldid, $newitemid, true);
 }
 
 protected function process_evaluacion($data) {
@@ -111,11 +111,11 @@ protected function process_evaluacion($data) {
     $data = (object)$data;
     $oldid = $data->id;
 
-    $data->taller_entrega_id = $this->get_new_parentid('entrega');
+    $data->pairs_delivery_id = $this->get_new_parentid('delivery');
     $data->evaluador_id = $this->get_mappingid('user', $data->evaluador_id);
-    $data->taller_id = $this->get_mappingid('taller', $data->taller_id);
+    $data->pairs_id = $this->get_mappingid('pairs', $data->pairs_id);
 
-    $newitemid = $DB->insert_record('taller_evaluacion_user', $data);
+    $newitemid = $DB->insert_record('pairs_evaluacion_user', $data);
     $this->set_mapping('evaluacion', $oldid, $newitemid);
 }
 
@@ -125,21 +125,21 @@ protected function process_respuestaEvaluacion($data) {
     $data = (object)$data;
     $oldid = $data->id;
 
-    $data->taller_evaluacion_user_id = $this->get_new_parentid('evaluacion');
-    $data->taller_opcion_cri_id = $this->get_mappingid('opcion_criterio', $data->taller_opcion_cri_id);
+    $data->pairs_evaluacion_user_id = $this->get_new_parentid('evaluacion');
+    $data->pairs_opcion_cri_id = $this->get_mappingid('opcion_criterio', $data->pairs_opcion_cri_id);
 
-    $newitemid = $DB->insert_record('taller_respuesta_rubrica', $data);
+    $newitemid = $DB->insert_record('pairs_answer_rubric', $data);
     $this->set_mapping('respuestaEvaluacion', $oldid, $newitemid);
 }
 
 protected function after_execute() {
     // Add choice related files, no need to match by itemname (just internally handled context)
-    $this->add_related_files('mod_taller', 'intro', null);
-    $this->add_related_files('mod_taller', 'instruccion_envio', null);
-    $this->add_related_files('mod_taller', 'instruccion_valoracion', null);
-    $this->add_related_files('mod_taller', 'retro_conclusion', null);
-    $this->add_related_files('mod_taller', 'criterio', null);
+    $this->add_related_files('mod_pairs', 'intro', null);
+    $this->add_related_files('mod_pairs', 'instruction_attachment', null);
+    $this->add_related_files('mod_pairs', 'instruction_assessment', null);
+    $this->add_related_files('mod_pairs', 'retro_conclusion', null);
+    $this->add_related_files('mod_pairs', 'criterio', null);
 
-    $this->add_related_files('mod_taller', 'submission_attachment', 'entrega');
+    $this->add_related_files('mod_pairs', 'submission_attachment', 'delivery');
 }
 }

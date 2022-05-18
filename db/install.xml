@@ -1,32 +1,32 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/taller/db" VERSION="20201009" COMMENT="XMLDB file for Moodle mod_taller"
+<XMLDB PATH="mod/pairs/db" VERSION="20201009" COMMENT="XMLDB file for Moodle mod_pairs"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
     <TABLES>
-        <TABLE NAME="taller" COMMENT="Stores the taller activity module instances.">
+        <TABLE NAME="pairs" COMMENT="Stores the pairs activity module instances.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="fase" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="fase en la que se encuentra el taller"/>
+                <FIELD NAME="fase" TYPE="int" LENGTH="2" NOTNULL="true" SEQUENCE="false" COMMENT="fase en la que se encuentra el pairs"/>
                 <FIELD NAME="name" TYPE="char" LENGTH="255" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the activity module instance"/>
                 <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Descripcion general"/>
                 <FIELD NAME="introformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
                 <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" SEQUENCE="false"/>
                 <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" UNSIGNED="true" DEFAULT="0" SEQUENCE="false"/>
-                <FIELD NAME="calif_envio" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="calificacion que recibe un estudiante por el envio"/>
-                <FIELD NAME="calif_aprobatoria" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="calificacion necesaria para aprobar el envio"/>
-                <FIELD NAME="calif_valoracion" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="porcentaje de la calificacion que tendra la valoracion de los demas estudiantes"/>
-                <FIELD NAME="calif_aprob_valoracion" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="calificacion aprobatoria de la valoracion"/>
-                <FIELD NAME="no_decimales" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="numero de decimales en la calificacion"/>
-                <FIELD NAME="no_archivos" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="numero maximo de archivos anexos que puede subir el alumno"/>
-                <FIELD NAME="tipo_arch" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="extenciones de los arvhivos permitidos"/>
-                <FIELD NAME="tam_max" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="100000" SEQUENCE="false" COMMENT="Maximum size of the one attached file"/>
-                <FIELD NAME="instruccion_envio" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Intrucciones para el envio"/>
-                <FIELD NAME="instruccion_envioformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
-                <FIELD NAME="instruccion_valoracion" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Intrucciones para la valoracion"/>
-                <FIELD NAME="instruccion_valoracionformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
-                <FIELD NAME="no_revisiones" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Numero de revisiones"/>
-                <FIELD NAME="puntos_max_rubrica" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Numero de puntos maximos que se daran en la rubrica"/>
+                <FIELD NAME="attachment" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="rating que recibe un estudiante por el envio"/>
+                <FIELD NAME="calif_aprobatoria" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="rating necesaria para aprobar el envio"/>
+                <FIELD NAME="assessment" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="porcentaje de la rating que tendra la valoracion de los demas estudiantes"/>
+                <FIELD NAME="calif_aprob_valoracion" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="rating aprobatoria de la valoracion"/>
+                <FIELD NAME="no_decimals" TYPE="int" LENGTH="2" NOTNULL="false" SEQUENCE="false" COMMENT="numero de decimales en la rating"/>
+                <FIELD NAME="no_attachments" TYPE="int" LENGTH="3" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="numero maximo de archivos anexos que puede subir el alumno"/>
+                <FIELD NAME="type_attachments" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="extenciones de los arvhivos permitidos"/>
+                <FIELD NAME="max_size" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="100000" SEQUENCE="false" COMMENT="Maximum size of the one attached file"/>
+                <FIELD NAME="instruction_attachment" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Intrucciones para el envio"/>
+                <FIELD NAME="instruction_attachmentformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
+                <FIELD NAME="instruction_assessment" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Intrucciones para la valoracion"/>
+                <FIELD NAME="instruction_assessmentformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
+                <FIELD NAME="no_revisions" TYPE="int" LENGTH="3" NOTNULL="false" SEQUENCE="false" COMMENT="Numero de revisiones"/>
+                <FIELD NAME="max_points_rubric" TYPE="int" LENGTH="4" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="Numero de puntos maximos que se daran en la rubrica"/>
                 <FIELD NAME="retro_conclusion" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Texto para la retro"/>
                 <FIELD NAME="retro_conclusionformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
                 <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al curso"/>
@@ -37,80 +37,80 @@
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="taller_entrega" COMMENT="entrega de tarea de los alumnos">
+        <TABLE NAME="pairs_delivery" COMMENT="delivery de tarea de los alumnos">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="titulo" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="titulo del archivo entregado"/>
-                <FIELD NAME="comentario" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="El comentario anexo al envio"/>
-                <FIELD NAME="envios" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="numero de archivos"/>
-                <FIELD NAME="envio_listo" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="indica si su envio esta listo para la siguiente fase"/>
-                <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" DECIMALS="5" COMMENT="Calificacion total de la entrega"/>        
-                <FIELD NAME="no_calificaciones" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Numero de calificaciones recibidas"/>        
-                <FIELD NAME="taller_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al taller"/>        
+                <FIELD NAME="title" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="title del archivo deliverydo"/>
+                <FIELD NAME="comment" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="El comment anexo al envio"/>
+                <FIELD NAME="attachments" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="numero de archivos"/>
+                <FIELD NAME="attachment_ready" TYPE="int" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" COMMENT="indica si su envio esta listo para la siguiente fase"/>
+                <FIELD NAME="rating" TYPE="number" LENGTH="10" NOTNULL="false" DEFAULT="0" SEQUENCE="false" DECIMALS="5" COMMENT="rating total de la delivery"/>        
+                <FIELD NAME="no_ratings" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Numero de ratinges recibidas"/>        
+                <FIELD NAME="pairs_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al pairs"/>        
                 <FIELD NAME="autor_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al usuario"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_taller" TYPE="foreign" FIELDS="taller_id" REFTABLE="taller" REFFIELDS="id"/>
+                <KEY NAME="fk_pairs" TYPE="foreign" FIELDS="pairs_id" REFTABLE="pairs" REFFIELDS="id"/>
                 <KEY NAME="fk_user" TYPE="foreign" FIELDS="autor_id" REFTABLE="user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="taller_criterio" COMMENT="Listado de los criterios de evaluacion">
+        <TABLE NAME="pairs_criterio" COMMENT="Listado de los criterios de evaluacion">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="criterio" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Criterio de evaluacion"/>
                 <FIELD NAME="criterioformat" TYPE="int" LENGTH="3" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field"/>
-                <FIELD NAME="taller_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al modulo"/>        
+                <FIELD NAME="pairs_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al modulo"/>        
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_taller" TYPE="foreign" FIELDS="taller_id" REFTABLE="taller" REFFIELDS="id"/>
+                <KEY NAME="fk_pairs" TYPE="foreign" FIELDS="pairs_id" REFTABLE="pairs" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="taller_opcion_cri" COMMENT="Listado de las posibles opciones de criterio">
+        <TABLE NAME="pairs_opcion_cri" COMMENT="Listado de las posibles opciones de criterio">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="definicion" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Descripcion de la opcion"/>
-                <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="puntuaje de la opcion"/>
-                <FIELD NAME="taller_criterio_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al modulo"/>
+                <FIELD NAME="rating" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="puntuaje de la opcion"/>
+                <FIELD NAME="pairs_criterio_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al modulo"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_taller_criterio" TYPE="foreign" FIELDS="taller_criterio_id" REFTABLE="taller_criterio" REFFIELDS="id"/>
+                <KEY NAME="fk_pairs_criterio" TYPE="foreign" FIELDS="pairs_criterio_id" REFTABLE="pairs_criterio" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="taller_evaluacion_user" COMMENT="Stores the taller activity module instances.">
+        <TABLE NAME="pairs_evaluacion_user" COMMENT="Stores the pairs activity module instances.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
                 <FIELD NAME="is_evaluado" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="campo para saber si el trabajo ya ha sido evaluado"/>
-                <FIELD NAME="calificacion" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="calificacion de la evauacion"/>
-                <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="estatus de la calificacion para ver si se toma en cuenta o no"/>        
-                <FIELD NAME="edit_user_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="si un profesor altera la calificacion aquí se mostrara"/>
-                <FIELD NAME="taller_entrega_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a la entrega"/>
+                <FIELD NAME="rating" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="rating de la evauacion"/>
+                <FIELD NAME="status" TYPE="int" LENGTH="2" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="estatus de la rating para ver si se toma en cuenta o no"/>        
+                <FIELD NAME="edit_user_id" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="si un profesor altera la rating aquí se mostrara"/>
+                <FIELD NAME="pairs_delivery_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a la delivery"/>
                 <FIELD NAME="evaluador_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al usuario"/>
-                <FIELD NAME="taller_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al taller"/>
+                <FIELD NAME="pairs_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Llave foranea referente al pairs"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
                 <KEY NAME="fk_user" TYPE="foreign" FIELDS="evaluador_id" REFTABLE="user" REFFIELDS="id"/>
-                <KEY NAME="fk_taller_entrega" TYPE="foreign" FIELDS="taller_entrega_id" REFTABLE="taller_entrega" REFFIELDS="id"/>
-                <KEY NAME="fk_taller" TYPE="foreign" FIELDS="taller_id" REFTABLE="taller" REFFIELDS="id"/>
+                <KEY NAME="fk_pairs_delivery" TYPE="foreign" FIELDS="pairs_delivery_id" REFTABLE="pairs_delivery" REFFIELDS="id"/>
+                <KEY NAME="fk_pairs" TYPE="foreign" FIELDS="pairs_id" REFTABLE="pairs" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 
-        <TABLE NAME="taller_respuesta_rubrica" COMMENT="Stores the taller activity module instances.">
+        <TABLE NAME="pairs_answer_rubric" COMMENT="Stores the pairs activity module instances.">
             <FIELDS>
                 <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-                <FIELD NAME="taller_opcion_cri_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a opciones criterio"/>
-                <FIELD NAME="taller_evaluacion_user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al calificacion usuario"/>
+                <FIELD NAME="pairs_opcion_cri_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente a opciones criterio"/>
+                <FIELD NAME="pairs_evaluacion_user_id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="llave foranea referente al rating usuario"/>
             </FIELDS>
             <KEYS>
                 <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
-                <KEY NAME="fk_opciones" TYPE="foreign" FIELDS="taller_opcion_cri_id" REFTABLE="taller_opcion_cri" REFFIELDS="id"/>
-                <KEY NAME="fk_calificaciones" TYPE="foreign" FIELDS="taller_evaluacion_user_id" REFTABLE="taller_evaluacion_user" REFFIELDS="id"/>
+                <KEY NAME="fk_opciones" TYPE="foreign" FIELDS="pairs_opcion_cri_id" REFTABLE="pairs_opcion_cri" REFFIELDS="id"/>
+                <KEY NAME="fk_ratinges" TYPE="foreign" FIELDS="pairs_evaluacion_user_id" REFTABLE="pairs_evaluacion_user" REFFIELDS="id"/>
             </KEYS>
         </TABLE>
 

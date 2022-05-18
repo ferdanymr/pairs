@@ -17,7 +17,7 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -34,18 +34,18 @@ class envio_form extends moodleform {
         $current        = $this->_customdata['current'];
         $attachmentopts = $this->_customdata['attachmentopts'];
 
-        $mform->addElement('header', 'general', get_string('envio', 'mod_taller'));
+        $mform->addElement('header', 'general', get_string('envio', 'mod_pairs'));
 
-        $mform->addElement('text', 'titulo', get_string('titulo', 'mod_taller'));
-        $mform->setType('titulo', PARAM_TEXT);
-        $mform->addRule('titulo', null, 'required', null, 'client');
-        $mform->addRule('titulo', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
+        $mform->addElement('text', 'title', get_string('title', 'mod_pairs'));
+        $mform->setType('title', PARAM_TEXT);
+        $mform->addRule('title', null, 'required', null, 'client');
+        $mform->addRule('title', get_string('maximumchars', '', 255), 'maxlength', 255, 'client');
 
-        $mform->addElement('textarea', "comentario", 'Comentario', array('cols' => 60, 'rows' => 3));
+        $mform->addElement('textarea', "comment", 'Comentario', array('cols' => 60, 'rows' => 3));
 
-        $mform->addElement('static', 'filemanagerinfo', get_string('num_max_arch', 'mod_taller'), 1);
+        $mform->addElement('static', 'filemanagerinfo', get_string('num_max_arch', 'mod_pairs'), 1);
         
-        $mform->addElement('filemanager', 'attachment_filemanager', get_string('adjunto', 'taller'),
+        $mform->addElement('filemanager', 'attachment_filemanager', get_string('adjunto', 'pairs'),
                                 null, $attachmentopts);
 
         $mform->addRule('attachment_filemanager', null, 'required', null, 'client');

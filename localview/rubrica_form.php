@@ -17,7 +17,7 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -31,28 +31,28 @@ class rubrica_form extends moodleform {
     //Add elements to form
     function definition() {
         $mform         = $this->_form;
-        $taller        = $this->_customdata['taller'];
+        $pairs        = $this->_customdata['pairs'];
         $criterios     = $this->_customdata['criterios'];
         $opcionesSelec = $this->_customdata['opcionesSelec'];
         $noCriterios   = count($criterios);
         $opcionSeleccionada;
-        $mform->addElement('header', 'rubrica', get_string('rub','mod_taller'));
+        $mform->addElement('header', 'rubrica', get_string('rub','mod_pairs'));
         $i = 1;
         foreach ($criterios as $criterio) { 
             
             $radioarray=array();
             
-            $opciones = $taller->get_opciones_criterio($criterio->id);
+            $opciones = $pairs->get_opciones_criterio($criterio->id);
 
             foreach ($opciones as $opcion) {
 
-                $radioarray[] = $mform->createElement('radio', "opcion$i", '', $opcion->definicion, "$opcion->id-$opcion->calificacion", $attributes);
-                $opcionSeleccionada = $opcion->id .'-'.$opcion->calificacion;
+                $radioarray[] = $mform->createElement('radio', "opcion$i", '', $opcion->definicion, "$opcion->id-$opcion->rating", $attributes);
+                $opcionSeleccionada = $opcion->id .'-'.$opcion->rating;
                 
                 if($opcionesSelec[$i - 1]){
                     
-                    if($opcionesSelec[$i - 1]->taller_opcion_cri_id == $opcion->id){
-                        $op = $opcion->id .'-'.$opcion->calificacion;
+                    if($opcionesSelec[$i - 1]->pairs_opcion_cri_id == $opcion->id){
+                        $op = $opcion->id .'-'.$opcion->rating;
                     }
 
                 }

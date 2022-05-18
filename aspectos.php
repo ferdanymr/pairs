@@ -17,7 +17,7 @@
 /**
  * Display information about all the mod_evaluatebypair modules in the requested course.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -40,27 +40,27 @@ $e  = optional_param('e', 0, PARAM_INT);
 $noAspectos = optional_param('no', 0, PARAM_INT);
 
 if ($cmid) {
-    $cm             = get_coursemodule_from_id('taller', $cmid, 0, false, MUST_EXIST);
+    $cm             = get_coursemodule_from_id('pairs', $cmid, 0, false, MUST_EXIST);
     $course         = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $moduleinstance = $DB->get_record('taller', array('id' => $cm->instance), '*', MUST_EXIST);
+    $moduleinstance = $DB->get_record('pairs', array('id' => $cm->instance), '*', MUST_EXIST);
 } else if ($e) {
-    $moduleinstance = $DB->get_record('taller', array('id' => $n), '*', MUST_EXIST);
+    $moduleinstance = $DB->get_record('pairs', array('id' => $n), '*', MUST_EXIST);
     $course         = $DB->get_record('course', array('id' => $moduleinstance->course), '*', MUST_EXIST);
-    $cm             = get_coursemodule_from_instance('taller', $moduleinstance->id, $course->id, false, MUST_EXIST);
+    $cm             = get_coursemodule_from_instance('pairs', $moduleinstance->id, $course->id, false, MUST_EXIST);
 }
 
-$taller =  new taller($moduleinstance, $cm, $course);
+$pairs =  new pairs($moduleinstance, $cm, $course);
 
 require_login($course, false, $cm);
 
 $modulecontext = context_module::instance($cmid);
-$PAGE->set_url(new moodle_url('/mod/taller/aspectos.php', array('cmid' => $cm->id)));
+$PAGE->set_url(new moodle_url('/mod/pairs/aspectos.php', array('cmid' => $cm->id)));
 
-$PAGE->set_title(get_string('pluginname', 'mod_taller'));
+$PAGE->set_title(get_string('pluginname', 'mod_pairs'));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
-$data = $DB->get_records_sql("SELECT * FROM {taller_criterio} WHERE taller_id = $taller->id;");
+$data = $DB->get_records_sql("SELECT * FROM {pairs_criterio} WHERE pairs_id = $pairs->id;");
 
 
 if($noAspectos){
@@ -73,17 +73,17 @@ if($noAspectos){
 
 }
 
-$mform = new aspectos_form(new moodle_url('/mod/taller/aspectos.php', array('cmid' => $cm->id,'no' => $noAspectos)), $noAspectos);
+$mform = new aspectos_form(new moodle_url('/mod/pairs/aspectos.php', array('cmid' => $cm->id,'no' => $noAspectos)), $noAspectos);
 
 if ($mform->is_cancelled()) {
     
-    redirect(new moodle_url('/mod/taller/view.php', array('id' => $cm->id)));
+    redirect(new moodle_url('/mod/pairs/view.php', array('id' => $cm->id)));
 
 } else if ($fromform = $mform->get_data()) {
     
-    $taller->edit_criterios($fromform, $noAspectos, $data);
+    $pairs->edit_criterios($fromform, $noAspectos, $data);
     
-    redirect(new moodle_url('/mod/taller/view.php', array('id' => $cm->id)),"Actualizacion exitosa");
+    redirect(new moodle_url('/mod/pairs/view.php', array('id' => $cm->id)),"Actualizacion exitosa");
 
 }else{
     $i = 1;
@@ -95,15 +95,15 @@ if ($mform->is_cancelled()) {
         $toform->$descripcion['text']   = $criterio->criterio;
         $toform->$descripcion['format'] = $criterio->criterioformat;
         
-        $data2 = $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} WHERE taller_criterio_id = $criterio->id;");
+        $data2 = $DB->get_records_sql("SELECT * FROM {pairs_opcion_cri} WHERE pairs_criterio_id = $criterio->id;");
         $j     = 1;
         
         foreach($data2 as $opcion){
-            $cali = "calif_envio$i$j";
+            $cali = "attachment$i$j";
             $def = "calif_def$i$j";
             $opcionid = "opcionid$i$j";
             $toform->$opcionid = $opcion->id;
-            $toform->$cali = (int)$opcion->calificacion;
+            $toform->$cali = (int)$opcion->rating;
             $toform->$def = $opcion->definicion;
             $j++;
         }

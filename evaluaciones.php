@@ -17,7 +17,7 @@
 /**
  * Display information about all the mod_evaluatebypair modules in the requested course.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -39,38 +39,38 @@ $edit = optional_param('edit', 0, PARAM_INT);
 $e  = optional_param('e', 0, PARAM_INT);
 
 if ($id) {
-    $cm             = get_coursemodule_from_id('taller', $id, 0, false, MUST_EXIST);
+    $cm             = get_coursemodule_from_id('pairs', $id, 0, false, MUST_EXIST);
     $course         = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-    $moduleinstance = $DB->get_record('taller', array('id' => $cm->instance), '*', MUST_EXIST);
+    $moduleinstance = $DB->get_record('pairs', array('id' => $cm->instance), '*', MUST_EXIST);
 } else if ($e) {
-    $moduleinstance = $DB->get_record('taller', array('id' => $n), '*', MUST_EXIST);
+    $moduleinstance = $DB->get_record('pairs', array('id' => $n), '*', MUST_EXIST);
     $course         = $DB->get_record('course', array('id' => $moduleinstance->course), '*', MUST_EXIST);
-    $cm             = get_coursemodule_from_instance('taller', $moduleinstance->id, $course->id, false, MUST_EXIST);
+    $cm             = get_coursemodule_from_instance('pairs', $moduleinstance->id, $course->id, false, MUST_EXIST);
 }
 
 require_login($course, true, $cm);
 
 $modulecontext   = context_module::instance($cm->id);
-$taller =  new taller($moduleinstance, $cm, $course);
+$pairs =  new pairs($moduleinstance, $cm, $course);
 
 if($idTrabajo){
 
-    $envio = $taller->get_envio_by_id($idTrabajo);
+    $envio = $pairs->get_delivery_by_id($idTrabajo);
 
 }else{
     
-    $evaluacion = $taller->get_evaluacion_pendiente_by_userId($USER->id);
+    $evaluacion = $pairs->get_pending_evaluation_by_userId($USER->id);
     $evaluacion = current($evaluacion);
 
     if(!$evaluacion){
         
-        $evaluacionesUser    = $taller->get_evaluaciones_completas_by_userId($USER->id);
+        $evaluacionesUser    = $pairs->get_complete_evaluations_by_userId($USER->id);
 
         if(count($evaluacionesUser) != 0){
 
             $ids = array();
             foreach ($evaluacionesUser as $eva) {
-                array_push($ids, $eva->taller_entrega_id);
+                array_push($ids, $eva->pairs_delivery_id);
             }
 
             $ids_separados_comas = implode(",",$ids);
@@ -81,17 +81,17 @@ if($idTrabajo){
 
         }
 
-        $groupmode = groups_get_activity_groupmode($taller->cm);
+        $groupmode = groups_get_activity_groupmode($pairs->cm);
         //0 si no hay grupos; 1 si hay grupos separados
         if($groupmode){
             
-            $groupid = groups_get_activity_group($taller->cm, true);
+            $groupid = groups_get_activity_group($pairs->cm, true);
 
-            $envio = $taller->get_envio_para_evaluar($USER->id, $ids_separados_comas, $groupid);
+            $envio = $pairs->get_delivery_for_evaluate($USER->id, $ids_separados_comas, $groupid);
 
         }else{
 
-            $envio = $taller->get_envio_para_evaluar($USER->id, $ids_separados_comas, $groupmode);
+            $envio = $pairs->get_delivery_for_evaluate($USER->id, $ids_separados_comas, $groupmode);
 
         }
 
@@ -101,51 +101,51 @@ if($idTrabajo){
             $envio                          = current($envio);
             $evaluacion                     = new stdClass;
             $evaluacion->is_evaluado        = '0';
-            $evaluacion->calificacion       = '0';
+            $evaluacion->rating       = '0';
             $evaluacion->status             = '1';
             $evaluacion->edit_user_id       = '0';
-            $evaluacion->taller_entrega_id  = $envio->id;
+            $evaluacion->pairs_delivery_id  = $envio->id;
             $evaluacion->evaluador_id       = $USER->id;
-            $evaluacion->taller_id          = $taller->id;
-            $DB->insert_record('taller_evaluacion_user', $evaluacion);
+            $evaluacion->pairs_id          = $pairs->id;
+            $DB->insert_record('pairs_evaluacion_user', $evaluacion);
 
         }
     }else{
-        $envio = $taller->get_envio_by_id($evaluacion->taller_entrega_id);
+        $envio = $pairs->get_delivery_by_id($evaluacion->pairs_delivery_id);
     }
 }
 
 if($edit){
 
-    $evaluacion = $taller->get_evaluacion_completa_by_entregaId($envio->id, $USER->id);
+    $evaluacion = $pairs->get_complete_evaluation_by_deliveryId($envio->id, $USER->id);
     $evaluacion = current($evaluacion);
-    $opcionesSelec = $taller->get_respuestas_evaluacion($evaluacion->id);
+    $opcionesSelec = $pairs->get_evaluation_answers($evaluacion->id);
     $opcionesSelec = array_values($opcionesSelec);
 
-    $mform = new rubrica_form(new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $idTrabajo, 'edit' => '1')), 
-    array('criterios' => $taller->get_criterios(), 'taller'=> $taller, 'opcionesSelec' => $opcionesSelec));
+    $mform = new rubrica_form(new moodle_url('/mod/pairs/evaluaciones.php', array('id' => $cm->id, 'trabajo' => $idTrabajo, 'edit' => '1')), 
+    array('criterios' => $pairs->get_criterios(), 'pairs'=> $pairs, 'opcionesSelec' => $opcionesSelec));
 
 }else{
 
-    $mform = new rubrica_form(new moodle_url('/mod/taller/evaluaciones.php', array('id' => $cm->id)), 
-    array('criterios' => $taller->get_criterios(), 'taller'=> $taller, 'opcionesSelec' => $opcionesSelec));
+    $mform = new rubrica_form(new moodle_url('/mod/pairs/evaluaciones.php', array('id' => $cm->id)), 
+    array('criterios' => $pairs->get_criterios(), 'pairs'=> $pairs, 'opcionesSelec' => $opcionesSelec));
 
 }
 
 if ($mform->is_cancelled()) {
 
-    redirect($taller->url_vista());
+    redirect($pairs->url_view());
 
 }else if ($fromform = $mform->get_data()) {
 
-    $taller->edit_opciones_criterio($opcionesSelec, $fromform, $evaluacion, $envio);
-    $taller->asignar_calificacion_by_valoracion($USER->id);
-    redirect($taller->url_vista());
+    $pairs->edit_opciones_criterio($opcionesSelec, $fromform, $evaluacion, $envio);
+    $pairs->assign_rating_by_valoracion($USER->id);
+    redirect($pairs->url_view());
 }
 
-$PAGE->set_url(new moodle_url('/mod/taller/envio.php', array('id' => $cm->id)));
+$PAGE->set_url(new moodle_url('/mod/pairs/envio.php', array('id' => $cm->id)));
 
-$PAGE->set_title(get_string('pluginname', 'mod_taller'));
+$PAGE->set_title(get_string('pluginname', 'mod_pairs'));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($modulecontext);
 
@@ -156,32 +156,32 @@ if(count($envio) == 0){
     
     echo '<div class="row">';
     echo '	<div class="col-12 text-center">';
-    echo '      <h3>'. get_string('no_env', 'mod_taller') . '</h3>';
+    echo '      <h3>'. get_string('no_env', 'mod_pairs') . '</h3>';
     echo '	</div>';
     echo '</div>';
 
 }else{
 
-    print_collapsible_region_start('','instrucciones-evaluacion', get_string('instruc_evaluacion','mod_taller'));
+    print_collapsible_region_start('','instrucciones-evaluacion', get_string('instruc_evaluacion','mod_pairs'));
     echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
     echo '	<div class="col-12">';
-    echo "      <p>$taller->instruccion_valoracion</p>";
+    echo "      <p>$pairs->instruction_assessment</p>";
     echo '	</div>';
     echo '</div>';
     print_collapsible_region_end();
 
     $fs = get_file_storage();
-    $files = $fs->get_area_files($modulecontext->id, 'mod_taller', 'submission_attachment', $envio->id);
+    $files = $fs->get_area_files($modulecontext->id, 'mod_pairs', 'submission_attachment', $envio->id);
 
     $file = end($files);
     
-    $context = $taller->context->id;
+    $context = $pairs->context->id;
     $filename = $file->get_filename();
     
-    $archivoUrl = new moodle_url("/pluginfile.php/$context/mod_taller/submission_attachment/$envio->id/$filename?forcedownload=1");
+    $archivoUrl = new moodle_url("/pluginfile.php/$context/mod_pairs/submission_attachment/$envio->id/$filename?forcedownload=1");
     
 
-    print_collapsible_region_start('','archivo',get_string('download_arch','mod_taller'));
+    print_collapsible_region_start('','archivo',get_string('download_arch','mod_pairs'));
     echo '<div class="row ml-2 mr-2 border border-top-0 border-primary shadow p-3 mb-5 bg-white rounded">';
     echo '	<div class="col-12">';
     echo '     <p><a class="btn btn-secondary" href="'. $archivoUrl.'">'.$filename.'</a></p>';

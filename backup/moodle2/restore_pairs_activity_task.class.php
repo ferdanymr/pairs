@@ -16,20 +16,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/taller/backup/moodle2/restore_taller_stepslib.php'); // Because it exists (must)
+require_once($CFG->dirroot . '/mod/pairs/backup/moodle2/restore_pairs_stepslib.php'); // Because it exists (must)
 
 /**
- * taller restore task that provides all the settings and steps to perform one
+ * pairs restore task that provides all the settings and steps to perform one
  * complete restore of the activity
  */
-class restore_taller_activity_task extends restore_activity_task {
+class restore_pairs_activity_task extends restore_activity_task {
 
     /**
      * Define (add) particular settings this activity can have
@@ -43,7 +43,7 @@ class restore_taller_activity_task extends restore_activity_task {
      */
     protected function define_my_steps() {
         // Choice only has one structure step
-        $this->add_step(new restore_taller_activity_structure_step('taller_structure', 'taller.xml'));
+        $this->add_step(new restore_pairs_activity_structure_step('pairs_structure', 'pairs.xml'));
     }
 
     /**
@@ -53,8 +53,8 @@ class restore_taller_activity_task extends restore_activity_task {
     static public function define_decode_contents() {
         $contents = array();
 
-        $contents[] = new restore_decode_content('taller',
-                          array('intro', 'instruccion_envio', 'instruccion_valoracion', 'retro_conclusion'), 'taller');
+        $contents[] = new restore_decode_content('pairs',
+                          array('intro', 'instruction_attachment', 'instruction_assessment', 'retro_conclusion'), 'pairs');
         $contents[] = new restore_decode_content('criterios_evaluacion',
                           array('criterio'), 'criterio_evaluacion');
 
@@ -68,8 +68,8 @@ class restore_taller_activity_task extends restore_activity_task {
     static public function define_decode_rules() {
         $rules = array();
 
-        //$rules[] = new restore_decode_rule('tallerVIEWBYID', '/mod/taller/view.php?id=$1', 'course_module');
-        //$rules[] = new restore_decode_rule('tallerINDEX', '/mod/taller/index.php?id=$1', 'course');
+        //$rules[] = new restore_decode_rule('pairsVIEWBYID', '/mod/pairs/view.php?id=$1', 'course_module');
+        //$rules[] = new restore_decode_rule('pairsINDEX', '/mod/pairs/index.php?id=$1', 'course');
 
         return $rules;
 
@@ -78,15 +78,15 @@ class restore_taller_activity_task extends restore_activity_task {
     /**
      * Define the restore log rules that will be applied
      * by the {@link restore_logs_processor} when restoring
-     * taller logs. It must return one array
+     * pairs logs. It must return one array
      * of {@link restore_log_rule} objects
      */
     static public function define_restore_log_rules() {
         $rules = array();
 
-        $rules[] = new restore_log_rule('taller', 'add', 'view.php?id={course_module}', '{taller}');
-        $rules[] = new restore_log_rule('taller', 'update', 'view.php?id={course_module}', '{taller}');
-        $rules[] = new restore_log_rule('taller', 'view', 'view.php?id={course_module}', '{taller}');
+        $rules[] = new restore_log_rule('pairs', 'add', 'view.php?id={course_module}', '{pairs}');
+        $rules[] = new restore_log_rule('pairs', 'update', 'view.php?id={course_module}', '{pairs}');
+        $rules[] = new restore_log_rule('pairs', 'view', 'view.php?id={course_module}', '{pairs}');
 
         return $rules;
     }
@@ -104,7 +104,7 @@ class restore_taller_activity_task extends restore_activity_task {
     static public function define_restore_log_rules_for_course() {
         $rules = array();
 
-        $rules[] = new restore_log_rule('taller', 'view all', 'index.php?id={course}', null);
+        $rules[] = new restore_log_rule('pairs', 'view all', 'index.php?id={course}', null);
 
         return $rules;
     }

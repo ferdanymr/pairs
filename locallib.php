@@ -15,14 +15,14 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Library of internal classes and functions for module taller
+ * Library of internal classes and functions for module pairs
  *
- * All the taller specific functions, needed to implement the module
+ * All the pairs specific functions, needed to implement the module
  * logic, should go to here. Instead of having bunch of function named
- * taller_something() taking the taller instance as the first
- * parameter, we use a class taller that provides all methods.
+ * pairs_something() taking the pairs instance as the first
+ * parameter, we use a class pairs that provides all methods.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -33,7 +33,7 @@ require_once(__DIR__.'/lib.php');     // we extend this library here
 require_once($CFG->libdir . '/gradelib.php');   // we use some rounding and comparing routines here
 require_once($CFG->libdir . '/filelib.php');
 
-class taller{
+class pairs{
 
     const NO_ASPECTOS = 4;
 
@@ -53,31 +53,31 @@ class taller{
 
     public $introformat;
 
-    public $calif_envio;
+    public $attachment;
 
     public $calif_aprobatoria;
 
-    public $calif_valoracion;
+    public $assessment;
 
     public $calif_aprov_valoracion;
 
-    public $no_decimales;
+    public $no_decimals;
 
-    public $no_archivos;
+    public $no_attachments;
 
-    public $tipo_arch = null;
+    public $type_attachments = null;
 
-    public $tam_max;
+    public $max_size;
 
-    public $instruccion_envio;
+    public $instruction_attachment;
 
-    public $instruccion_envioformat;
+    public $instruction_attachmentformat;
 
-    public $instruccion_valoracion;
+    public $instruction_assessment;
 
-    public $instruccion_valoracionformat;
+    public $instruction_assessmentformat;
 
-    public $no_revisiones;
+    public $no_revisions;
 
     public $retro_conclusion;
 
@@ -85,12 +85,12 @@ class taller{
 
     public $context;
 
-    public $puntos_max_rubrica;
+    public $max_points_rubric;
     
     public function __construct(stdclass $dbrecord, $cm, $course, stdclass $context=null) {
         $this->dbrecord = $dbrecord;
         foreach ($this->dbrecord as $field => $value) {
-            if (property_exists('taller', $field)) {
+            if (property_exists('pairs', $field)) {
                 
                 $this->{$field} = $value;
 
@@ -115,9 +115,9 @@ class taller{
     }
 
     
-    public function url_vista() {
+    public function url_view() {
         global $CFG;
-        return new moodle_url('/mod/taller/view.php', array('id' => $this->cm->id));
+        return new moodle_url('/mod/pairs/view.php', array('id' => $this->cm->id));
     }
 
     public function get_info_user($userId){
@@ -127,92 +127,98 @@ class taller{
 
     }
 
-    public function get_envio_by_userId($userId){
+    public function get_delivery_by_userId($userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_entrega} 
-                                        WHERE taller_id = $this->id 
+        return $DB->get_records_sql("SELECT * FROM {pairs_delivery} 
+                                        WHERE pairs_id = $this->id 
                                         AND autor_id = $userId;");
     }
 
-    public function get_envios(){
+    public function get_deliverys(){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_entrega} 
-                                        WHERE taller_id = $this->id;");
+        return $DB->get_records_sql("SELECT * FROM {pairs_delivery} 
+                                        WHERE pairs_id = $this->id;");
     }
 
-    public function get_evaluaciones_completas_by_userId($userId){
+    public function get_no_deliverys(){
         global $DB;
-        return $DB->get_records_sql("SELECT taller_entrega_id 
-                                        FROM {taller_evaluacion_user} 
-                                        WHERE taller_id = $this->id 
+        return $DB->get_records_sql("SELECT COUNT(id) AS no_deliverys FROM {pairs_delivery} 
+                                        WHERE pairs_id = $this->id;");
+    }
+
+    public function get_complete_evaluations_by_userId($userId){
+        global $DB;
+        return $DB->get_records_sql("SELECT pairs_delivery_id 
+                                        FROM {pairs_evaluacion_user} 
+                                        WHERE pairs_id = $this->id 
                                         AND evaluador_id = $userId 
                                         AND is_evaluado = 1;");
     }
 
-    public function get_evaluaciones_completas_by_report($userId){
+    public function get_complete_evaluations_by_report($userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
-                                        WHERE taller_id = $this->id 
+        return $DB->get_records_sql("SELECT * FROM {pairs_evaluacion_user} 
+                                        WHERE pairs_id = $this->id 
                                         AND evaluador_id = $userId 
                                         AND is_evaluado = 1;");
     }
     
-    public function get_evaluacion_completa_by_entregaId($entregaId, $userId){
+    public function get_complete_evaluation_by_deliveryId($deliveryId, $userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
-                                        WHERE taller_id = $this->id 
+        return $DB->get_records_sql("SELECT * FROM {pairs_evaluacion_user} 
+                                        WHERE pairs_id = $this->id 
                                         AND evaluador_id = $userId 
                                         AND is_evaluado = 1 
-                                        AND taller_entrega_id = $entregaId;");
+                                        AND pairs_delivery_id = $deliveryId;");
     }
 
-    public function get_evaluacion_by_id($id){
+    public function get_evaluation_by_id($id){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} WHERE id = $id;");
+        return $DB->get_records_sql("SELECT * FROM {pairs_evaluacion_user} WHERE id = $id;");
     }
 
-    public function get_evaluacion_pendiente_by_userId($userId){
+    public function get_pending_evaluation_by_userId($userId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
-                                        WHERE taller_id = $this->id 
+        return $DB->get_records_sql("SELECT * FROM {pairs_evaluacion_user} 
+                                        WHERE pairs_id = $this->id 
                                         AND evaluador_id = $userId 
                                         AND is_evaluado = 0;");
     }
 
-    public function get_respuestas_evaluacion($evaluacionId){
+    public function get_evaluation_answers($evaluacionId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_respuesta_rubrica} 
-                                        WHERE taller_evaluacion_user_id = $evaluacionId 
+        return $DB->get_records_sql("SELECT * FROM {pairs_answer_rubric} 
+                                        WHERE pairs_evaluacion_user_id = $evaluacionId 
                                         ORDER BY id 
                                         ASC;");
     }
     
-    public function get_envio_para_evaluar($userId, $evaluacionesCompletas, $groupid){
+    public function get_delivery_for_evaluate($userId, $evaluacionesCompletas, $groupid){
         global $DB;
         if($groupid){
 
-            $sql = "SELECT entrega.id, entrega.titulo, entrega.comentario,
-                        entrega.envios, entrega.envio_listo, entrega.calificacion,
-                        entrega.no_calificaciones, entrega.taller_id, entrega.autor_id
-                        FROM {taller_entrega} AS entrega
+            $sql = "SELECT delivery.id, delivery.title, delivery.comment,
+                        delivery.attachments, delivery.attachment_ready, delivery.rating,
+                        delivery.no_ratings, delivery.pairs_id, delivery.autor_id
+                        FROM {pairs_delivery} AS delivery
                         JOIN {groups_members} AS members
-                        ON members.userid = entrega.autor_id
+                        ON members.userid = delivery.autor_id
                         WHERE members.groupid = $groupid
-                        AND entrega.taller_id = $this->id 
-                        AND entrega.envio_listo = 1 
-                        AND entrega.autor_id != $userId 
-                        AND entrega.id NOT IN ($evaluacionesCompletas) 
-                        ORDER BY entrega.no_calificaciones 
+                        AND delivery.pairs_id = $this->id 
+                        AND delivery.attachment_ready = 1 
+                        AND delivery.autor_id != $userId 
+                        AND delivery.id NOT IN ($evaluacionesCompletas) 
+                        ORDER BY delivery.no_ratings 
                         DESC LIMIT 1;";
 
         }else{
 
-            $sql = "SELECT * FROM {taller_entrega} 
-                        WHERE taller_id = $this->id 
-                        AND envio_listo = 1 
+            $sql = "SELECT * FROM {pairs_delivery} 
+                        WHERE pairs_id = $this->id 
+                        AND attachment_ready = 1 
                         AND autor_id != $userId 
                         AND id NOT IN ($evaluacionesCompletas) 
-                        ORDER BY no_calificaciones 
+                        ORDER BY no_ratings 
                         DESC LIMIT 1;";
 
         }
@@ -220,40 +226,40 @@ class taller{
         return $DB->get_records_sql($sql);
     }
 
-    public function get_envio_by_id($id){
+    public function get_delivery_by_id($id){
         global $DB;
-        return $DB->get_record_sql("SELECT * FROM {taller_entrega} 
-                                        WHERE taller_id = $this->id 
+        return $DB->get_record_sql("SELECT * FROM {pairs_delivery} 
+                                        WHERE pairs_id = $this->id 
                                         AND id = $id;");
     }
 
     public function get_criterios(){
         global $DB;
-        return  $DB->get_records_sql("SELECT * FROM {taller_criterio} 
-                                        WHERE taller_id = $this->id;");
+        return  $DB->get_records_sql("SELECT * FROM {pairs_criterio} 
+                                        WHERE pairs_id = $this->id;");
     }
 
     public function get_opciones_criterio($criterioId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} 
-                                        WHERE taller_criterio_id = $criterioId;");
+        return $DB->get_records_sql("SELECT * FROM {pairs_opcion_cri} 
+                                        WHERE pairs_criterio_id = $criterioId;");
     }
 
     public function update_evaluacion($evaluacion){
         global $DB;
-        $DB->update_record('taller_evaluacion_user', $evaluacion);
+        $DB->update_record('pairs_evaluacion_user', $evaluacion);
     }
 
-    public function update_entrega($entrega){
+    public function update_delivery($delivery){
         global $DB;
-        $DB->update_record('taller_entrega', $entrega);
+        $DB->update_record('pairs_delivery', $delivery);
     }
 
-    public function get_evaluaciones_by_envioId($envioId){
+    public function get_evaluations_by_deliveryId($envioId){
         global $DB;
-        return $DB->get_records_sql("SELECT * FROM {taller_evaluacion_user} 
-                                        WHERE taller_id = $this->id 
-                                        AND taller_entrega_id = $envioId;");
+        return $DB->get_records_sql("SELECT * FROM {pairs_evaluacion_user} 
+                                        WHERE pairs_id = $this->id 
+                                        AND pairs_delivery_id = $envioId;");
     }
 
     public function get_resourse_for_report($groupid = 0, $contextid=0){
@@ -261,128 +267,128 @@ class taller{
         if($groupid){
             
             $sql = "SELECT user.id AS idalumno, user.firstname, user.lastname, 
-                        entrega.id AS entregaid, entrega.titulo,
-                        entrega.calificacion, entrega.no_calificaciones,
-                        entrega.autor_id AS autor
+                        delivery.id AS deliveryid, delivery.title,
+                        delivery.rating, delivery.no_ratings,
+                        delivery.autor_id AS autor
                         FROM {groups_members} AS members 
                         JOIN {user} AS user ON members.userid = user.id
-                        LEFT JOIN {taller_entrega} AS entrega ON user.id = entrega.autor_id AND entrega.taller_id = $this->id
+                        LEFT JOIN {pairs_delivery} AS delivery ON user.id = delivery.autor_id AND delivery.pairs_id = $this->id
                         WHERE members.groupid = $groupid;";
 
         }else{
             $sql = "SELECT user.id AS idalumno, user.firstname, user.lastname, 
-            entrega.id AS entregaid, entrega.titulo,
-            entrega.calificacion, entrega.no_calificaciones,
-            entrega.autor_id AS autor
-            FROM mdl_user AS user
+            delivery.id AS deliveryid, delivery.title,
+            delivery.rating, delivery.no_ratings,
+            delivery.autor_id AS autor
+            FROM {user} AS user
             INNER JOIN {groups_members} AS members ON members.userid = user.id 
             INNER JOIN {role_assignments} AS role_assig ON role_assig.userid = user.id 
             INNER JOIN mdl_role ON mdl_role.id = role_assig.roleid
-            LEFT JOIN {taller_entrega} AS entrega ON user.id = entrega.autor_id AND entrega.taller_id = $this->id;";
+            LEFT JOIN {pairs_delivery} AS delivery ON user.id = delivery.autor_id AND delivery.pairs_id = $this->id;";
 
         }
         return $DB->get_records_sql($sql);
     }
 
-    public function set_puntos_totales_rubrica(){
+    public function set_total_points_rubric(){
         global $DB;
         $criterios = $this->get_criterios();
         $puntos = 0;
         
         foreach($criterios as $criterio){
-            $p = $DB->get_records_sql("SELECT * FROM {taller_opcion_cri} 
-                                        WHERE taller_criterio_id = $criterio->id 
-                                        ORDER BY calificacion 
+            $p = $DB->get_records_sql("SELECT * FROM {pairs_opcion_cri} 
+                                        WHERE pairs_criterio_id = $criterio->id 
+                                        ORDER BY rating 
                                         DESC 
                                         LIMIT 1;");
             $p = current($p);
-            $puntos +=  $p->calificacion;
+            $puntos +=  $p->rating;
         }
 
-        $this->dbrecord->puntos_max_rubrica = $puntos;
-        $DB->update_record('taller', $this->dbrecord, $bulk=false);
+        $this->dbrecord->max_points_rubric = $puntos;
+        $DB->update_record('pairs', $this->dbrecord, $bulk=false);
     }
 
-    public function asignar_calificacion_by_valoracion($userId){
-        $envio = $this->get_envio_by_userId($userId);
+    public function assign_rating_by_valoracion($userId){
+        $envio = $this->get_delivery_by_userId($userId);
         $envio = current($envio);
-        $this->asignar_calificacion($envio);
+        $this->assign_rating($envio);
     }
 
-    public function asignar_calificacion($envio){
+    public function assign_rating($envio){
         global $DB;
-        //las evaluaciones que ha recibido el trabajo junto con su calificacion
-        $evaluaciones = $this->get_evaluaciones_by_envioId($envio->id);
-        $calificacion = 0;
+        //las evaluaciones que ha recibido el trabajo junto con su rating
+        $evaluaciones = $this->get_evaluations_by_deliveryId($envio->id);
+        $rating = 0;
         if(!empty($evaluaciones)){
         
             foreach ($evaluaciones as $evaluacion) {
 
-                $calificacion += $evaluacion->calificacion;
+                $rating += $evaluacion->rating;
 
             }
 
             //la sumatoria de las evaluaciones sobre el numero de evaluaciones
-            $calificacion = $calificacion /  count($evaluaciones);
+            $rating = $rating /  count($evaluaciones);
 
-            $calificacion = $calificacion * $this->calif_envio; 
+            $rating = $rating * $this->attachment; 
 
-            //calificacion total del envio
-            $calificacion = $calificacion / $this->puntos_max_rubrica;
+            //rating total del envio
+            $rating = $rating / $this->max_points_rubric;
         }
         
-        //calificacion del envio más la calificacion de valoracion
-        $valoraciones = $this->get_evaluaciones_completas_by_userId($envio->autor_id);
+        //rating del envio más la rating de valoracion
+        $valoraciones = $this->get_complete_evaluations_by_userId($envio->autor_id);
         $valoraciones = count($valoraciones);
 
         if($valoraciones > 0){
             
-            $valorUnaEvaluacion = $this->calif_valoracion / $this->no_revisiones;
+            $valorUnaEvaluacion = $this->assessment / $this->no_revisions;
             
-            $calificacionValoracion = $valoraciones * $valorUnaEvaluacion;
+            $ratingValoracion = $valoraciones * $valorUnaEvaluacion;
 
-            $calificacion += $calificacionValoracion;
+            $rating += $ratingValoracion;
 
         }
 
-        $calificacion = round($calificacion, $this->no_decimales);
+        $rating = round($rating, $this->no_decimals);
         
-        $envio->calificacion = $calificacion;
+        $envio->rating = $rating;
 
-        $DB->update_record('taller_entrega', $envio);
+        $DB->update_record('pairs_delivery', $envio);
 
-        //$this->mandar_calificacion_gradebook($envio->autor_id);
+        //$this->send_rating_gradebook($envio->autor_id);
     }
 
-    public function fin_taller(){
+    public function end_pairs(){
 
-        $this->mandar_calificacion_gradebook();
+        $this->send_rating_gradebook();
         
     }
 
-    public function taller_completado_by_user($envio){
+    public function pairs_completed_by_user($envio){
         global $DB;
 
-        $envio->envio_listo = 2;
-        $DB->update_record('taller_entrega', $envio);
+        $envio->attachment_ready = 2;
+        $DB->update_record('pairs_delivery', $envio);
 
     }
 
     public function edit_opciones_criterio($opciones, $dataform, $evaluacion, $envio){
         global $DB;
-        $calificacion = 0;
+        $rating = 0;
         if($opciones){
             $contador = 0;
             foreach ($dataform as $opcion) {
                 
                 $opcion = explode("-", $opcion);
-                $calificacion += $opcion[1];
+                $rating += $opcion[1];
 
                 if(strlen($opcion[0]) < 4){
                     $data->id                        = $opciones[$contador]->id;
-                    $data->taller_opcion_cri_id      = $opcion[0];
-                    $data->taller_evaluacion_user_id = $evaluacion->id;
-                    $DB->update_record('taller_respuesta_rubrica', $data);
+                    $data->pairs_opcion_cri_id      = $opcion[0];
+                    $data->pairs_evaluacion_user_id = $evaluacion->id;
+                    $DB->update_record('pairs_answer_rubric', $data);
                 }
                 $contador++;
             }
@@ -392,55 +398,55 @@ class taller{
             foreach ($dataform as $opcion) {
                 
                 $opcion = explode("-", $opcion);
-                $calificacion += $opcion[1];
+                $rating += $opcion[1];
                 
                 if(strlen($opcion[0]) < 4){
-                    $data->taller_opcion_cri_id      = $opcion[0];
-                    $data->taller_evaluacion_user_id = $evaluacion->id;
-                    $DB->insert_record('taller_respuesta_rubrica', $data);
+                    $data->pairs_opcion_cri_id      = $opcion[0];
+                    $data->pairs_evaluacion_user_id = $evaluacion->id;
+                    $DB->insert_record('pairs_answer_rubric', $data);
                 }
                 
             }
 
-            $envio->no_calificaciones = $envio->no_calificaciones + 1;
-            $this->update_entrega($envio);
+            $envio->no_ratings = $envio->no_ratings + 1;
+            $this->update_delivery($envio);
             $evaluacion->is_evaluado = '1';
         }
 
-        $evaluacion->calificacion = $calificacion;
+        $evaluacion->rating = $rating;
         $this->update_evaluacion($evaluacion);
         
-        $this->asignar_calificacion($envio);
+        $this->assign_rating($envio);
     }
 
-    public function edit_envio($data){
+    public function edit_delivery($data){
         global $USER, $DB;
 
-        $data->envios             = '0';
-        $data->envio_listo        = '0';
-        $data->calificacion       = '0';
-        $data->no_calificaciones  = '0';
-        $data->taller_id = $this->id;
+        $data->attachments             = '0';
+        $data->attachment_ready        = '0';
+        $data->rating       = '0';
+        $data->no_ratings  = '0';
+        $data->pairs_id = $this->id;
         $data->autor_id           = $USER->id;
         
         if(is_null($data->id)){
 
-            $data->id = $DB->insert_record('taller_entrega', $data);
+            $data->id = $DB->insert_record('pairs_delivery', $data);
 
         }
         
         $data = file_postupdate_standard_filemanager($data, 'attachment', $this->filemanager_options(),
-            $this->context, 'mod_taller', 'submission_attachment', $data->id);
+            $this->context, 'mod_pairs', 'submission_attachment', $data->id);
         
         if (empty($data->attachment)) {
                 // Explicit cast to zero integer.
                 $data->attachment = 0;
-                $data->envios     = '0';
+                $data->attachments     = '0';
         }else{
-            $data->envios = $data->attachment;
+            $data->attachments = $data->attachment;
         }
 
-        $DB->update_record('taller_entrega', $data);
+        $DB->update_record('pairs_delivery', $data);
             
     }
     /**
@@ -454,9 +460,9 @@ class taller{
 
         return array(
             'subdirs' => 0,
-            'maxbytes' => $this->tam_max,
-            'maxfiles' => $this->no_archivos,
-            'accepted_types'=> $this->tipo_arch,
+            'maxbytes' => $this->max_size,
+            'maxfiles' => $this->no_attachments,
+            'accepted_types'=> $this->type_attachments,
             'return_types' => FILE_INTERNAL | FILE_EXTERNAL,
         );
     }
@@ -467,33 +473,33 @@ class taller{
         
         for($j = 1; $j <= 4; $j++){
             $definicion                              = "calif_def$i$j";
-            $calificacion                            = "calif_envio$i$j";
+            $rating                            = "attachment$i$j";
             $opcionid                                = "opcionid$i$j";
 
             if(strlen($fromform->$opcionid) != 0){
             
                 $opcionCriterio->id                 = $fromform->$opcionid;
                 $opcionCriterio->definicion         = $fromform->$definicion;
-                $opcionCriterio->calificacion       = $fromform->$calificacion;
-                $opcionCriterio->taller_criterio_id = $idCriterio;
-                $DB->update_record('taller_opcion_cri', $opcionCriterio, $bulk=false);
+                $opcionCriterio->rating       = $fromform->$rating;
+                $opcionCriterio->pairs_criterio_id = $idCriterio;
+                $DB->update_record('pairs_opcion_cri', $opcionCriterio, $bulk=false);
             
             }else{
             
                 if(strlen($fromform->$definicion) != 0){
 
                     $opcionCriterio->definicion         = $fromform->$definicion;
-                    $opcionCriterio->calificacion       = $fromform->$calificacion;
-                    $opcionCriterio->taller_criterio_id = $idCriterio;
+                    $opcionCriterio->rating       = $fromform->$rating;
+                    $opcionCriterio->pairs_criterio_id = $idCriterio;
 
-                    $DB->insert_record('taller_opcion_cri', $opcionCriterio);
+                    $DB->insert_record('pairs_opcion_cri', $opcionCriterio);
 
                 }
 
             }
         }
         
-        $this->set_puntos_totales_rubrica();
+        $this->set_total_points_rubric();
 
     }
 
@@ -506,18 +512,18 @@ class taller{
             $definicion = "calif_def$i$j";
             
             if(strlen($fromform->$definicion) != 0){
-                $calificacion                       = "calif_envio$i$j";
+                $rating                       = "attachment$i$j";
                 $opcionCriterio->definicion         = $fromform->$definicion;
-                $opcionCriterio->calificacion       = $fromform->$calificacion;
-                $opcionCriterio->taller_criterio_id = $idCriterio;
+                $opcionCriterio->rating       = $fromform->$rating;
+                $opcionCriterio->pairs_criterio_id = $idCriterio;
 
-                $DB->insert_record('taller_opcion_cri', $opcionCriterio);
+                $DB->insert_record('pairs_opcion_cri', $opcionCriterio);
 
             }
         
         }
 
-        $this->set_puntos_totales_rubrica();
+        $this->set_total_points_rubric();
 
     }
 
@@ -534,8 +540,8 @@ class taller{
                 
                 $criterio->criterio           = $descripcion['text'];
                 $criterio->criterioformat     = $descripcion['format'];
-                $criterio->taller_id = $this->id;
-                $idCriterio                   = $DB->insert_record('taller_criterio', $criterio);
+                $criterio->pairs_id = $this->id;
+                $idCriterio                   = $DB->insert_record('pairs_criterio', $criterio);
 
                 $this->add_opciones_criterio($fromform, $idCriterio, $i);
             }
@@ -556,8 +562,8 @@ class taller{
             $criterio->id                 = $fromform->$descripcionid;
             $criterio->criterio           = $descripcion['text'];
             $criterio->criterioformat     = $descripcion['format'];
-            $criterio->taller_id = $this->id; 
-            $DB->update_record('taller_criterio', $criterio, $bulk=false);
+            $criterio->pairs_id = $this->id; 
+            $DB->update_record('pairs_criterio', $criterio, $bulk=false);
 
             $this->editar_opciones_criterio($fromform, $criterio->id, $i);
         }
@@ -573,8 +579,8 @@ class taller{
 
                     $criterio->criterio           = $descripcion['text'];
                     $criterio->criterioformat     = $descripcion['format'];
-                    $criterio->taller_id          = $this->id;
-                    $idCriterio                   = $DB->insert_record('taller_criterio', $criterio);
+                    $criterio->pairs_id          = $this->id;
+                    $idCriterio                   = $DB->insert_record('pairs_criterio', $criterio);
 
                     $this->add_opciones_criterio($fromform, $idCriterio, $i);
 
@@ -585,32 +591,32 @@ class taller{
         }
     }
 
-    public function mandar_calificacion_gradebook($user=0){
-        $taller = new stdclass();
+    public function send_rating_gradebook($user=0){
+        $pairs = new stdclass();
             foreach ($this as $property => $value) {
-                $taller->{$property} = $value;
+                $pairs->{$property} = $value;
             }
-            $taller->course     = $this->course->id;
-            $taller->cmidnumber = $this->cm->id;
-            $taller->modname    = 'taller';
-            taller_update_grades($taller, $user);
+            $pairs->course     = $this->course->id;
+            $pairs->cmidnumber = $this->cm->id;
+            $pairs->modname    = 'pairs';
+            pairs_update_grades($pairs, $user);
     }
 
     public function reset_userdata(stdClass $data){
-        $this->reset_userdata_envios($data);
+        $this->reset_userdata_attachments($data);
     }
 
-    protected function reset_userdata_envios(stdClass $data) {
+    protected function reset_userdata_attachments(stdClass $data) {
         global $DB;
         
-        $DB->set_field('taller', 'fase', '0', array('id' => $this->id));
+        $DB->set_field('pairs', 'fase', '0', array('id' => $this->id));
         $this->fase = '0';
 
-        $envios = $this->get_envios();
-        foreach ($envios as $envio) {
+        $attachments = $this->get_deliverys();
+        foreach ($attachments as $envio) {
             $this->delete_evaluacion_user($envio);
-            $this->delete_envio($envio);
-            $DB->delete_records('taller_entrega', array('id' => $envio->id));
+            $this->delete_delivery($envio);
+            $DB->delete_records('pairs_delivery', array('id' => $envio->id));
         }
 
         return true;
@@ -618,23 +624,23 @@ class taller{
 
     protected function delete_evaluacion_user($envio){
         global $DB;
-        $evaluaciones = $this->get_evaluaciones_by_envioId($envio->id);
+        $evaluaciones = $this->get_evaluations_by_deliveryId($envio->id);
         
         if(!empty($evaluaciones)){
         
             foreach ($evaluaciones as $evaluacion) {
 
-                $DB->delete_records('taller_respuesta_rubrica', array('taller_evaluacion_user_id' => $evaluacion->id));
+                $DB->delete_records('pairs_answer_rubric', array('pairs_evaluacion_user_id' => $evaluacion->id));
     
             }
     
-            $DB->delete_records('taller_evaluacion_user', array('id' => $evaluacion->id));
+            $DB->delete_records('pairs_evaluacion_user', array('id' => $evaluacion->id));
 
         }
     }
 
-    protected function delete_envio($envio){
+    protected function delete_delivery($envio){
         $fs = get_file_storage();
-        $fs->delete_area_files($this->context->id, 'mod_taller', 'submission_attachment', $envio->id);
+        $fs->delete_area_files($this->context->id, 'mod_pairs', 'submission_attachment', $envio->id);
     }
 }

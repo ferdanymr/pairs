@@ -17,7 +17,7 @@
 /**
  * Plugin version and other meta-data are defined here.
  *
- * @package     mod_taller
+ * @package     mod_pairs
  * @copyright   2021 Fernando Munoz <fernando_munoz@cuaieed.unam.mx>
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -35,7 +35,7 @@ class aspectos_form extends moodleform {
         $mform = $this->_form; // Don't forget the underscore! 
         $noAspectos = $this->_customdata;
 
-        $mform->addElement('html', '<h3>'. get_string('rub','mod_taller') .'</h3>');
+        $mform->addElement('html', '<h3>'. get_string('rub','mod_pairs') .'</h3>');
         
         $opciones = array();
         for($i = 100; $i >= 0; $i--){
@@ -43,19 +43,19 @@ class aspectos_form extends moodleform {
         }
 
         for($i = 1; $i <= $noAspectos; $i++){
-            $mform->addElement('header', "criterio$i", get_string('criterio', 'mod_taller').' '.$i);
+            $mform->addElement('header', "criterio$i", get_string('criterio', 'mod_pairs').' '.$i);
         
-            $mform->addElement('editor', "descripcion$i", get_string('descrip', 'mod_taller'));
+            $mform->addElement('editor', "descripcion$i", get_string('descrip', 'mod_pairs'));
             $mform->setType("descripcion$i", PARAM_RAW);
 
             $mform->addElement('hidden', 'descripcionid'.$i,'');   // value set by set_data() later
 
             for($j = 1; $j <= 4; $j++){
-                $calificacion_definicion = array();
-                $calificacion_definicion[] = $mform->createElement('select', "calif_envio$i$j", '', $opciones);
-                $calificacion_definicion[] = $mform->createElement('textarea', "calif_def$i$j", '', array('cols' => 60, 'rows' => 3));
-                $mform->addGroup($calificacion_definicion, "calif_definicion$i$j", get_string('calif_def', 'mod_taller'), array(' '), false);
-                $mform->setDefault("calif_envio$i$j","1");
+                $rating_definicion = array();
+                $rating_definicion[] = $mform->createElement('select', "attachment$i$j", '', $opciones);
+                $rating_definicion[] = $mform->createElement('textarea', "calif_def$i$j", '', array('cols' => 60, 'rows' => 3));
+                $mform->addGroup($rating_definicion, "rating_definicion$i$j", get_string('calif_def', 'mod_pairs'), array(' '), false);
+                $mform->setDefault("attachment$i$j","1");
                 $mform->addElement('hidden', "opcionid$i$j",'');
             }
         }
