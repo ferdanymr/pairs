@@ -38,17 +38,17 @@ protected function define_structure() {
 
     $paths[]  = new restore_path_element('pairs', '/activity/pairs');
 
-    $paths[] = new restore_path_element('criterio_evaluacion', '/activity/pairs/criterios_evaluacion/criterio_evaluacion');
-    $paths[] = new restore_path_element('opcion_criterio', '/activity/pairs/criterios_evaluacion/criterio_evaluacion/opciones_criterio/opcion_criterio');
+    $paths[] = new restore_path_element('pairs_criterio', '/activity/pairs/pairs_criterios/pairs_criterio');
+    $paths[] = new restore_path_element('pairs_opcion_cri', '/activity/pairs/pairs_criterios/pairs_criterio/pairs_opciones_cri/pairs_opcion_cri');
 
     // End here if no-user data has been selected
     if (!$userinfo) {
         return $this->prepare_activity_structure($paths);
     }
 
-    $paths[] = new restore_path_element('delivery', '/activity/pairs/deliverys/delivery');
-    $paths[] = new restore_path_element('evaluacion', '/activity/pairs/deliverys/delivery/evaluaciones/evaluacion');
-    $paths[] = new restore_path_element('respuestaEvaluacion', '/activity/pairs/deliverys/delivery/evaluaciones/evaluacion/respuestasEvaluaciones/respuestaEvaluacion');
+    $paths[] = new restore_path_element('pairs_delivery', '/activity/pairs/pairs_deliverys/pairs_delivery');
+    $paths[] = new restore_path_element('pairs_evaluacion_user', '/activity/pairs/pairs_deliverys/pairs_delivery/pairs_evaluacions_user/pairs_evaluacion_user');
+    $paths[] = new restore_path_element('pairs_answer_rubric', '/activity/pairs/pairs_deliverys/pairs_delivery/pairs_evaluacions_user/pairs_evaluacion_user/pairs_answers_rubric/pairs_answer_rubric');
     // Return the paths wrapped into standard activity structure
     return $this->prepare_activity_structure($paths);
 }
@@ -68,7 +68,7 @@ protected function process_pairs($data) {
     $this->apply_activity_instance($newitemid);
 }
 
-protected function process_criterio_evaluacion($data) {
+protected function process_pairs_criterio($data) {
     global $DB;
 
     $data = (object)$data;
@@ -77,22 +77,22 @@ protected function process_criterio_evaluacion($data) {
     $data->pairs_id = $this->get_new_parentid('pairs');
     
     $newitemid = $DB->insert_record('pairs_criterio', $data);
-    $this->set_mapping('criterio_evaluacion', $oldid, $newitemid);
+    $this->set_mapping('pairs_criterio', $oldid, $newitemid);
 }
 
-protected function process_opcion_criterio($data) {
+protected function process_pairs_opcion_cri($data) {
     global $DB;
 
     $data = (object)$data;
     $oldid = $data->id;
 
-    $data->pairs_criterio_id = $this->get_new_parentid('criterio_evaluacion');
+    $data->pairs_criterio_id = $this->get_new_parentid('pairs_criterio');
 
     $newitemid = $DB->insert_record('pairs_opcion_cri', $data);
-    $this->set_mapping('opcion_criterio', $oldid, $newitemid);
+    $this->set_mapping('pairs_opcion_cri', $oldid, $newitemid);
 }
 
-protected function process_delivery($data) {
+protected function process_pairs_delivery($data) {
     global $DB;
 
     $data = (object)$data;
@@ -102,34 +102,34 @@ protected function process_delivery($data) {
     $data->autor_id = $this->get_mappingid('user', $data->autor_id);
 
     $newitemid = $DB->insert_record('pairs_delivery', $data);
-    $this->set_mapping('delivery', $oldid, $newitemid, true);
+    $this->set_mapping('pairs_delivery', $oldid, $newitemid, true);
 }
 
-protected function process_evaluacion($data) {
+protected function process_pairs_evaluacion_user($data) {
     global $DB;
 
     $data = (object)$data;
     $oldid = $data->id;
 
-    $data->pairs_delivery_id = $this->get_new_parentid('delivery');
+    $data->pairs_delivery_id = $this->get_new_parentid('pairs_delivery');
     $data->evaluador_id = $this->get_mappingid('user', $data->evaluador_id);
-    $data->pairs_id = $this->get_mappingid('pairs', $data->pairs_id);
+    $data->pairs_id = $this->get_new_parentid('pairs');
 
     $newitemid = $DB->insert_record('pairs_evaluacion_user', $data);
-    $this->set_mapping('evaluacion', $oldid, $newitemid);
+    $this->set_mapping('pairs_evaluacion_user', $oldid, $newitemid);
 }
 
-protected function process_respuestaEvaluacion($data) {
+protected function process_pairs_answer_rubric($data) {
     global $DB;
 
     $data = (object)$data;
     $oldid = $data->id;
 
-    $data->pairs_evaluacion_user_id = $this->get_new_parentid('evaluacion');
-    $data->pairs_opcion_cri_id = $this->get_mappingid('opcion_criterio', $data->pairs_opcion_cri_id);
+    $data->pairs_evaluacion_user_id = $this->get_new_parentid('pairs_evaluacion_user');
+    $data->pairs_opcion_cri_id = $this->get_mappingid('pairs_opcion_cri', $data->pairs_opcion_cri_id);
 
     $newitemid = $DB->insert_record('pairs_answer_rubric', $data);
-    $this->set_mapping('respuestaEvaluacion', $oldid, $newitemid);
+    $this->set_mapping('pairs_answer_rubric', $oldid, $newitemid);
 }
 
 protected function after_execute() {
@@ -140,6 +140,7 @@ protected function after_execute() {
     $this->add_related_files('mod_pairs', 'retro_conclusion', null);
     $this->add_related_files('mod_pairs', 'criterio', null);
 
-    $this->add_related_files('mod_pairs', 'submission_attachment', 'delivery');
+    $this->add_related_files('mod_pairs', 'submission_attachment', 'pairs_delivery');
 }
+
 }

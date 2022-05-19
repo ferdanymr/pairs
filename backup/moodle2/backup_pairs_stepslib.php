@@ -20,62 +20,63 @@ class backup_pairs_activity_structure_step extends backup_activity_structure_ste
         ));
         
         //definimos la envoltura para los criterios de evaluacion
-        $criterios_evaluacion = new backup_nested_element('criterios_evaluacion');
+        $pairs_criterios = new backup_nested_element('pairs_criterios');
 
-        $criterio_evaluacion = new backup_nested_element('criterio_evaluacion', array('id'),array(
+        $pairs_criterio = new backup_nested_element('pairs_criterio', array('id'),array(
             'criterio','criterioformat'
         ));
 
-        $opciones_criterio = new backup_nested_element('opciones_criterio');
+        $pairs_opciones_cri = new backup_nested_element('pairs_opciones_cri');
 
-        $opcion_criterio = new backup_nested_element('opcion_criterio',array('id'),array(
+        $pairs_opcion_cri = new backup_nested_element('pairs_opcion_cri',array('id'),array(
             'definicion','rating','pairs_criterio_id'
         ));
 
-        $deliverys = new backup_nested_element('deliverys');
+        $pairs_deliverys = new backup_nested_element('pairs_deliverys');
 
-        $delivery = new backup_nested_element('delivery',array('id'),array(
+        $pairs_delivery = new backup_nested_element('pairs_delivery',array('id'),array(
             'title','comment','attachments','attachment_ready','rating','no_ratings','autor_id'
         ));
 
-        $evaluaciones = new backup_nested_element('evaluaciones');
+        $pairs_evaluacions_user = new backup_nested_element('pairs_evaluacions_user');
 
-        $evaluacion = new backup_nested_element('evaluacion',array('id'),array(
+        $pairs_evaluacion_user = new backup_nested_element('pairs_evaluacion_user',array('id'),array(
             'is_evaluado','rating','status','edit_user_id','evaluador_id'
         ));
 
-        $respuestasEvaluaciones = new backup_nested_element('respuestasEvaluaciones');
+        $pairs_answers_rubric = new backup_nested_element('pairs_answers_rubric');
 
-        $respuestaEvaluacion = new backup_nested_element('respuestaEvaluacion',array('id'),array(
+        $pairs_answer_rubric = new backup_nested_element('pairs_answer_rubric',array('id'),array(
+            'pairs_opcion_cri_id','pairs_evaluacion_user_id'
         ));
 
 
         // Build the tree
-        $pairs->add_child($criterios_evaluacion);
-        $criterios_evaluacion->add_child($criterio_evaluacion);
+        $pairs->add_child($pairs_criterios);
+        $pairs_criterios->add_child($pairs_criterio);
         
-        $pairs->add_child($deliverys);
-        $deliverys->add_child($delivery);
+        $pairs->add_child($pairs_deliverys);
+        $pairs_deliverys->add_child($pairs_delivery);
 
-        $criterio_evaluacion->add_child($opciones_criterio);
-        $opciones_criterio->add_child($opcion_criterio);
+        $pairs_criterio->add_child($pairs_opciones_cri);
+        $pairs_opciones_cri->add_child($pairs_opcion_cri);
 
-        $delivery->add_child($evaluaciones);
-        $evaluaciones->add_child($evaluacion);
+        $pairs_delivery->add_child($pairs_evaluacions_user);
+        $pairs_evaluacions_user->add_child($pairs_evaluacion_user);
 
-        $evaluacion->add_child($respuestasEvaluaciones);
-        $respuestasEvaluaciones->add_child($respuestaEvaluacion);
+        $pairs_evaluacion_user->add_child($pairs_answers_rubric);
+        $pairs_answers_rubric->add_child($pairs_answer_rubric);
         
         // Define sources
         $pairs->set_source_table('pairs', array('id' => backup::VAR_ACTIVITYID));
 
-        $criterio_evaluacion->set_source_sql('
+        $pairs_criterio->set_source_sql('
             SELECT *
               FROM {pairs_criterio}
              WHERE pairs_id = ?',
             array(backup::VAR_PARENTID));
 
-        $opcion_criterio->set_source_sql('
+        $pairs_opcion_cri->set_source_sql('
         SELECT *
           FROM {pairs_opcion_cri}
          WHERE pairs_criterio_id = ?',
@@ -84,19 +85,19 @@ class backup_pairs_activity_structure_step extends backup_activity_structure_ste
         // All the rest of elements only happen if we are including user info
         if ($userinfo) {
             
-            $delivery->set_source_sql('
+            $pairs_delivery->set_source_sql('
             SELECT *
               FROM {pairs_delivery}
              WHERE pairs_id = ?',
             array(backup::VAR_PARENTID));
 
-            $evaluacion->set_source_sql('
+            $pairs_evaluacion_user->set_source_sql('
             SELECT *
               FROM {pairs_evaluacion_user}
              WHERE pairs_delivery_id = ?',
             array(backup::VAR_PARENTID));
 
-            $respuestaEvaluacion->set_source_sql('
+            $pairs_answer_rubric->set_source_sql('
             SELECT *
               FROM {pairs_answer_rubric}
              WHERE pairs_evaluacion_user_id = ?',
@@ -105,17 +106,17 @@ class backup_pairs_activity_structure_step extends backup_activity_structure_ste
         }
 
         // Define id annotations
-        $delivery->annotate_ids('user','autor_id');
-        $evaluacion->annotate_ids('user','evaluador_id');
+        $pairs_delivery->annotate_ids('user','autor_id');
+        $pairs_evaluacion_user->annotate_ids('user','evaluador_id');
 
         // Define file annotations
         $pairs->annotate_files('mod_pairs', 'intro', null);
         $pairs->annotate_files('mod_pairs', 'instruction_attachment', null);
         $pairs->annotate_files('mod_pairs', 'instruction_assessment', null);
         $pairs->annotate_files('mod_pairs', 'retro_conclusion', null);
-        $criterio_evaluacion->annotate_files('mod_pairs', 'criterio', null);
+        $pairs_criterio->annotate_files('mod_pairs', 'criterio', null);
 
-        $delivery->annotate_files('mod_pairs', 'submission_attachment', 'id');
+        $pairs_delivery->annotate_files('mod_pairs', 'submission_attachment', 'id');
         // Return the root element (pairs), wrapped into standard activity structure
         return $this->prepare_activity_structure($pairs);
     }

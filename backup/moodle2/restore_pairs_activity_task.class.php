@@ -55,8 +55,8 @@ class restore_pairs_activity_task extends restore_activity_task {
 
         $contents[] = new restore_decode_content('pairs',
                           array('intro', 'instruction_attachment', 'instruction_assessment', 'retro_conclusion'), 'pairs');
-        $contents[] = new restore_decode_content('criterios_evaluacion',
-                          array('criterio'), 'criterio_evaluacion');
+        $contents[] = new restore_decode_content('pairs_criterio',
+                          array('criterio'), 'pairs_criterio');
 
         return $contents;
     }
